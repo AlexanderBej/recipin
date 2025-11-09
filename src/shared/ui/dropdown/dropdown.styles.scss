@@ -1,0 +1,20 @@
+// @use '../../../styles/tokens.scss' as *;
+
+// .dropdown-container {
+//   display: inline-block;
+//   position: relative;
+
+//   .dropdown-menu {
+//     position: absolute;
+//     top: 100%;
+//     right: 0;
+//     z-index: 1;
+//     min-width: 100px;
+//     @include themed(background-color, color-bg-card, $color-bg-card);
+//     border-radius: $radius-sm;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 10px;
+//     padding: $spacing-4;
+//   }
+// }

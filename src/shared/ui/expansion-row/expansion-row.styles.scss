@@ -1,0 +1,35 @@
+// @use '../../../styles/tokens.scss' as *;
+
+// .expansion-row {
+//   width: 100%;
+//   border-bottom: 1px solid rgb(238, 238, 238);
+
+//   &:last-child {
+//     border-bottom: none;
+//   }
+
+//   .expansion-btn {
+//     width: 100%;
+//     font-size: 1rem;
+//     line-height: 3rem;
+//   }
+
+//   .expanded-content {
+//     overflow: clip;
+//     max-height: 0;
+//     opacity: 0;
+//     transition:
+//       max-height $transition-normal,
+//       opacity $transition-normal;
+
+//     &[data-open='true'] {
+//       max-height: 1000px; /* large enough to fit expected content */
+//       opacity: 1;
+//       padding: 0.75rem;
+//       background: rgba(0, 0, 0, 0.02);
+//       border-top: 1px solid rgba(0, 0, 0, 0.08);
+//       border-bottom-left-radius: 0.5rem;
+//       border-bottom-right-radius: 0.5rem;
+//     }
+//   }
+// }

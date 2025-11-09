@@ -1,0 +1,60 @@
+@use './variables' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-body;
+  color: $color-text-primary;
+  background-color: $color-bg-main;
+}
+
+button {
+  background: unset;
+  border: unset;
+  cursor: pointer;
+}
+
+a,
+Link {
+  text-decoration: none;
+  color: rgb(35, 35, 35);
+  transition: all 0.2s ease-in;
+  font-weight: 500;
+  position: relative;
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+ul {
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: $font-heading;
+}
+
+.error-text-red {
+  color: red;
+  font-size: 11px;
+}

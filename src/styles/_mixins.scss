@@ -1,0 +1,71 @@
+@use './variables' as *;
+
+@mixin shrinkLabel {
+  top: -14px;
+  font-size: 12px;
+  color: black;
+}
+
+@mixin flex($justify: center, $align: center) {
+  display: flex;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+@mixin grid($templateColumns: repeat(4, 1fr), $templateRows: 1fr, $columnGap: 0px, $rowGap: 0px) {
+  display: grid;
+  grid-template-columns: $templateColumns;
+  grid-template-rows: $templateRows;
+  grid-column-gap: $columnGap;
+  grid-row-gap: $rowGap;
+}
+
+@mixin dashboard-card($radius: $radius-lg, $pad: $spacing-5 $spacing-6, $bgCol: $color-bg-card) {
+  @include themed(background-color, color-bg-card, $bgCol);
+  border-radius: $radius;
+  padding: $pad;
+  height: auto;
+  box-shadow: $shadow-sm;
+}
+
+$breakpoints: (
+  // (small phones): 0–359px
+  xs: 0,
+  // (phones): 360–479px
+  sm: 360px,
+  // large phones / small phablets): 480–767px
+  md: 480px,
+  // (tablets portrait): 768–1023px
+  lg: 768px,
+  //(tablet landscape / small laptops): 1024–1439px
+  xl: 1024px,
+  // (desktops): ≥1440px
+  xxl: 1440px
+);
+
+// 2) Min-width mixin (mobile-first)
+@mixin mediaUp($bp) {
+  @media (min-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
+}
+
+// 3) Max-width mixin (if you prefer “down” queries)
+@mixin mediaDown($bp) {
+  @media (max-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
+}
+
+// 4) Height mixin
+@mixin mediaMax-h($h) {
+  @media (max-height: $h) {
+    @content;
+  }
+}
+
+// theme mixin
+@mixin themed($prop, $token, $fallback) {
+  #{$prop}: $fallback; // SSR/old browsers fallback
+  #{$prop}: var(--#{$token}, #{$fallback}); // runtime theme
+}

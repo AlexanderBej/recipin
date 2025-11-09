@@ -1,0 +1,52 @@
+// @use '../../../styles/tokens.scss' as *;
+
+// .info-popover {
+//   position: relative;
+//   display: inline-flex;
+//   align-items: center;
+
+//   .info-popover-toggler {
+//     display: block;
+//     padding: 0;
+//     margin: 0;
+//   }
+
+//   .info-popover-container {
+//     position: absolute;
+//     z-index: 50;
+//     padding: $spacing-3 $spacing-4;
+//     font-size: 14px;
+//     border-radius: $radius-md;
+//     @include themed(background-color, color-bg-card, $color-bg-card);
+//     box-shadow: $shadow-md;
+//     min-width: 250px;
+
+//     &__top {
+//       bottom: 100%;
+//       left: 50%;
+//       transform: translateX(-50%);
+//       margin-bottom: 6px;
+//     }
+
+//     &__right {
+//       left: 100%;
+//       top: 50%;
+//       transform: translateY(-50%);
+//       margin-left: 6px;
+//     }
+
+//     &__bottom {
+//       top: 100%;
+//       left: 50%;
+//       transform: translateX(-50%);
+//       margin-top: 6px;
+//     }
+
+//     &__left {
+//       right: 100%;
+//       top: 50%;
+//       transform: translateY(-50%);
+//       margin-right: 6px;
+//     }
+//   }
+// }

@@ -1,0 +1,10 @@
+.icon-container {
+  display: inline-flex; /* or inline-block */
+  align-items: center;
+  justify-content: center;
+  line-height: 0; /* removes baseline extra space */
+}
+
+.icon-container svg {
+  display: block; /* avoids inline baseline behavior */
+}

@@ -1,0 +1,23 @@
+@forward 'variables';
+@forward 'mixins';
+@forward 'styles';
+
+@use 'variables' as *;
+
+:root {
+  --color-primary: #{$color-primary};
+  --color-primary-dark: #{$color-primary-dark};
+
+  --color-bg-main: #{$color-bg-main};
+  --color-bg-card: #{$color-bg-card};
+
+  --color-text-primary: #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+
+  --color-neutral: #{$color-neutral};
+}
+
+.error {
+  font-size: 12px;
+  color: $color-error;
+}
