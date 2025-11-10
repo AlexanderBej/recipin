@@ -5,6 +5,6 @@ import { RootState } from '@store/store';
 
 export default function ProtectedRoute({ children }: { children: JSX.Element }) {
   const user = useSelector((s: RootState) => s.auth.user);
-  if (!user) return <Navigate to="/signin" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   return children;
 }

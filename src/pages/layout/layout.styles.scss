@@ -1,37 +1,19 @@
-// @use '../../styles/tokens.scss' as *;
+@use '../../styles/global.scss' as *;
 
-// .main-layout {
-//   height: 100dvh;
-//   display: flex;
-//   align-items: center;
-//   flex-direction: row;
-//   flex-wrap: nowrap;
-//   overflow: hidden;
+.main-layout {
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  overflow: hidden;
 
-//   @include mediaDown(md) {
-//     display: block;
-//   }
-
-//   .main-outlet {
-//     height: 100dvh;
-//     flex: 1;
-//     display: flex;
-//     flex-direction: column;
-//     overflow: hidden;
-//     max-width: 1100px;
-
-//     .outlet-container {
-//       flex: 1 1 auto;
-//       min-height: 0; /* IMPORTANT: allow child to be smaller than content */
-//       overflow: auto;
-//       margin: 30px 30px 30px 40px;
-
-//       @include mediaDown(md) {
-//         margin: 0 $spacing-4;
-//         margin-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
-//         position: relative;
-//         padding-bottom: 20px;
-//       }
-//     }
-//   }
-// }
+  .outlet-container {
+    flex: 1 1 auto;
+    min-height: 0; /* IMPORTANT: allow child to be smaller than content */
+    overflow: auto;
+    width: 100%;
+    margin-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    padding: $spacing-5;
+  }
+}

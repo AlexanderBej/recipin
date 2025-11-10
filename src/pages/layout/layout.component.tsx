@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { PageSpinner } from '@shared/ui';
-import { BottomTabBar } from '@components';
+import { BottomTabBar, TopTitleBar } from '@components';
 import { selectAppBootState } from '@store/index';
 
 import './layout.styles.scss';
@@ -17,6 +17,7 @@ const Layout: React.FC = () => {
         <PageSpinner />
       ) : (
         <>
+          <TopTitleBar />
           <main className="outlet-container">
             <Outlet />
           </main>

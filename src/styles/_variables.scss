@@ -48,6 +48,7 @@ $color-text-secondary: $silver;
 // Backgrounds
 $color-bg-main: $night;
 $color-bg-card: $eerie-black;
+$color-bg-card-light: color.scale($color-bg-card, $lightness: 5%);
 
 // ---------- TYPOGRAPHY ----------
 
@@ -64,11 +65,14 @@ $font-body:
 $font-mono: 'Roboto Mono', monospace;
 
 // Font sizes (rem-based scale)
-$font-size-h1: 2rem; // ~32px
-$font-size-h2: 1.5rem; // ~24px
-$font-size-h3: 1.25rem; // ~20px
-$font-size-body: 1rem; // ~16px
-$font-size-small: 0.875rem; // ~14px
+$size-xxl: 4rem; // 64px
+$size-xl: 3rem; // 48px
+$size-h1: 2rem; // ~32px
+$size-h2: 1.5rem; // ~24px
+$size-h3: 1.25rem; // ~20px
+$size-body: 1rem; // ~16px
+$size-small: 0.875rem; // ~14px
+$size-xsmall: 0.688rem; // ~11px
 
 // Font weights
 $font-weight-regular: 400;

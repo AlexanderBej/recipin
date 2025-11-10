@@ -2,6 +2,7 @@ import React from 'react';
 import { IconType } from 'react-icons';
 
 import './icon.styles.scss';
+import clsx from 'clsx';
 
 interface GalIconProps {
   icon: IconType;
@@ -11,11 +12,10 @@ interface GalIconProps {
 }
 
 const RecIcon: React.FC<GalIconProps> = ({ icon: Icon, color = 'black', size = 24, className }) => (
-  <div className="icon-container">
-    {React.createElement(Icon as React.FC<{ size: number; color: string; className?: string }>, {
+  <div className={clsx('icon-container', className)}>
+    {React.createElement(Icon as React.FC<{ size: number; color: string }>, {
       size: size,
       color: color,
-      className: className,
     })}
   </div>
 );

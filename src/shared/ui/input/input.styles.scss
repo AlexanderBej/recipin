@@ -1,3 +1,5 @@
+@use '../../../styles/global.scss' as *;
+
 .input-wrapper {
   display: flex;
   flex-direction: column;
@@ -11,23 +13,40 @@
   color: #333;
 }
 
-.input-field {
-  padding: 0.6rem 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+.input-row {
+  width: 100%;
+  position: relative;
 
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  .input-prefix {
+    position: absolute;
+    left: 14px;
+    top: 14px;
   }
 
-  &.input-error {
-    border-color: #e53935;
+  .input-field {
+    width: 100%;
+    padding: $spacing-4 $spacing-5;
+    background-color: $color-neutral;
+    border: 1px solid $color-bg-card-light;
+    border-radius: $radius-lg;
+    font-size: 1rem;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+    }
+
+    &.input-error {
+      border-color: #e53935;
+    }
+  }
+
+  .input-with-prefix {
+    padding-left: 50px;
   }
 }
 

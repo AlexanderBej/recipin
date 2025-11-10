@@ -1,0 +1,19 @@
+@use '../../styles/global.scss' as *;
+
+.top-title-bar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  height: 56px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $spacing-3;
+
+  background: linear-gradient(180deg, rgba(28, 28, 28, 0.85), rgba(18, 18, 18, 0.65));
+  -webkit-backdrop-filter: saturate(150%) blur(10px);
+  backdrop-filter: saturate(150%) blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}

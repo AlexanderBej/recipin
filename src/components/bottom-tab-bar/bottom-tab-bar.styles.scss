@@ -1,83 +1,79 @@
-// @use '../../styles/tokens.scss' as *;
+@use '../../styles/global.scss' as *;
 
-// .bottom-nav {
-//   display: none;
+.bottom-tab-bar {
+  width: 100%;
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 74px;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid $color-neutral;
+  background-color: $color-bg-card;
 
-//   @include mediaDown(md) {
-//     display: block;
-//     position: fixed;
-//     left: 0;
-//     right: 0;
-//     bottom: 0;
-//     height: 76px;
-//     padding-bottom: env(safe-area-inset-bottom);
-//     border-top: 1px solid;
-//     @include themed(border-color, color-neutral, $color-neutral);
-//     @include themed(background, color-bg-main, $color-bg-main);
-//   }
+  .nav-items {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
 
-//   .nav-row {
-//     height: 66px;
-//     margin-top: 10px;
-//     border-top-left-radius: $radius-md;
-//     border-top-right-radius: $radius-md;
-//   }
+    .nav-item {
+      width: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-//   .nav-links {
-//     margin: 0;
-//     padding: 0;
-//     display: flex;
-//     width: 100%;
-//     justify-content: space-between;
-//     position: relative;
+      .nav-link {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        position: relative;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-2;
 
-//     .inline {
-//       display: inline-flex;
-//       gap: 10px;
+        .nav-icon,
+        span {
+          opacity: 0.6;
+        }
 
-//       .open-drawer-btn-container {
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
+        &.active {
+          .nav-icon,
+          span {
+            opacity: 1;
+          }
+        }
 
-//         .open-drawer-btn {
-//           width: 100%;
-//         }
-//       }
-//     }
+        .user-avatar {
+          height: 28px;
+          width: 28px;
+          background-size: cover;
+          background-position: center;
+          border-radius: 50%;
+          overflow: hidden;
+        }
 
-//     .fab {
-//       position: absolute;
-//       left: 50%;
-//       transform: translateX(-50%);
-//       bottom: 10px;
-//       width: 75px;
-//       height: 75px;
-//       border-radius: 50%;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       @include themed(background, color-bg-main, $color-bg-main);
-//       padding: 10px;
-//     }
+        span {
+          color: $color-text-primary;
+          font-size: $size-xsmall;
+        }
+      }
+    }
 
-//     li {
-//       width: 70px;
+    .fab {
+      position: relative;
 
-//       .nav-link {
-//         height: 56px;
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-
-//         &:hover {
-//           background-color: $color-secondary-dark;
-//         }
-//         &.active {
-//           background-color: $color-primary-dark;
-//           font-weight: 600;
-//         }
-//       }
-//     }
-//   }
-// }
+      .add-recipe-btn-wrapper {
+        padding: $spacing-3;
+        background-color: $color-bg-main;
+        border-radius: 50%;
+        padding: 12px;
+        position: absolute;
+        bottom: $spacing-3;
+      }
+    }
+  }
+}
