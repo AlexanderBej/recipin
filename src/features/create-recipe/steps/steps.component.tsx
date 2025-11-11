@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { StepThreeProps } from '../create-recipe.misc';
-import { Button, Input, Textarea } from '@shared/ui';
+import { Button, Textarea } from '@shared/ui';
 
 import './steps.styles.scss';
 
@@ -12,12 +12,12 @@ const Steps: React.FC<StepThreeProps> = ({ formData, setFormData }) => {
     setFormData({ ...formData, steps: next });
   };
 
-  const removeStep = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      steps: prev.steps.filter((_, i) => i !== index),
-    }));
-  };
+  // const removeStep = (index: number) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     steps: prev.steps.filter((_, i) => i !== index),
+  //   }));
+  // };
 
   return (
     <div className="space-y-3">
