@@ -5,6 +5,7 @@ module.exports = {
     alias: {
       '@api': path.resolve(__dirname, 'src/api'),
       '@components': path.resolve(__dirname, 'src/components/index.ts'),
+      '@features': path.resolve(__dirname, 'src/features'),
       '@lib': path.resolve(__dirname, 'src/lib'),
       '@pages': path.resolve(__dirname, 'src/pages/index.ts'),
       '@shared': path.resolve(__dirname, 'src/shared'),

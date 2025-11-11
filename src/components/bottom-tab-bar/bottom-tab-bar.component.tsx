@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { IoMdAdd } from 'react-icons/io';
@@ -14,7 +14,9 @@ import './bottom-tab-bar.styles.scss';
 // const placeholderImage = require('../../assets/img_placeholder.png');
 
 const BottomTabBar: React.FC = () => {
+  const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
+
   const library = NAV_ITEMS.find((item) => item.key === 'library');
   const grocery = NAV_ITEMS.find((item) => item.key === 'grocery');
   const planner = NAV_ITEMS.find((item) => item.key === 'planner');
@@ -58,7 +60,7 @@ const BottomTabBar: React.FC = () => {
 
         <li className="fab nav-item">
           <div className="add-recipe-btn-wrapper">
-            <Button shape="round" variant="primary">
+            <Button shape="round" variant="primary" onClick={() => navigate('/create')}>
               <RecIcon icon={IoMdAdd} size={24} color={getCssVar('--color-text-primary')} />
             </Button>
           </div>

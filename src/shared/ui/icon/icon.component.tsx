@@ -11,7 +11,7 @@ interface GalIconProps {
   className?: string;
 }
 
-const RecIcon: React.FC<GalIconProps> = ({ icon: Icon, color = 'black', size = 24, className }) => (
+const RecIcon: React.FC<GalIconProps> = ({ icon: Icon, color = 'white', size = 24, className }) => (
   <div className={clsx('icon-container', className)}>
     {React.createElement(Icon as React.FC<{ size: number; color: string }>, {
       size: size,

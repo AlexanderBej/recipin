@@ -8,6 +8,7 @@ import {
   updateRecipe,
   deleteRecipe,
 } from '@api/services';
+import { createAppAsyncThunk } from '@api/types';
 
 type RecipesState = {
   items: Recipe[];
@@ -18,20 +19,44 @@ type RecipesState = {
 
 const initialState: RecipesState = { items: [], loading: false, selected: null, error: null };
 
-export const fetchMyRecipes = createAsyncThunk('recipes/fetchMine', async (uid: string) => {
-  return await listRecipesByOwner(uid);
-});
+export const fetchMyRecipes = createAppAsyncThunk<Recipe[], { uid: string }>(
+  'recipes/fetchMine',
+  async ({ uid }, { rejectWithValue }) => {
+    try {
+      const next = await listRecipesByOwner(uid);
+      return next;
+    } catch (error: any) {
+      return rejectWithValue(error.message ?? 'Failed to load your recipes');
+    }
+  },
+);
+
+// export const fetchMyRecipes = createAsyncThunk('recipes/fetchMine', async (uid: string) => {
+//   return await listRecipesByOwner(uid);
+// });
 
 export const fetchRecipeById = createAsyncThunk('recipes/fetchOne', async (id: string) => {
   return await getRecipe(id);
 });
 
-export const createRecipe = createAsyncThunk(
-  'recipes/create',
-  async (data: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => {
-    return await addRecipe(data);
-  },
-);
+export const createRecipe = createAppAsyncThunk<
+  string,
+  { data: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'> }
+>('recipes/create', async ({ data }, { rejectWithValue }) => {
+  try {
+    const id = await addRecipe(data);
+    return id;
+  } catch (error: any) {
+    return rejectWithValue(error.message ?? 'Failed to create new recipes');
+  }
+});
+
+// export const createRecipe = createAsyncThunk(
+//   'recipes/create',
+//   async (data: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => {
+//     return await addRecipe(data);
+//   },
+// );
 
 export const saveRecipe = createAsyncThunk(
   'recipes/save',
@@ -69,13 +94,23 @@ const recipesSlice = createSlice({
       })
       .addCase(fetchMyRecipes.rejected, (s, a) => {
         s.loading = false;
-        s.error = a.error.message ?? 'Error';
+        s.error = a.error.message ?? 'Error fetching your recipes';
       })
+
+      .addCase(createRecipe.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
+      .addCase(createRecipe.fulfilled, (s) => {
+        s.loading = false;
+      })
+      .addCase(createRecipe.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.error.message ?? 'Error creating recipe';
+      })
+
       .addCase(fetchRecipeById.fulfilled, (s, a: PayloadAction<Recipe | null>) => {
         s.selected = a.payload ?? null;
-      })
-      .addCase(createRecipe.fulfilled, (s, a: PayloadAction<string>) => {
-        // Optionally refetch list after creation in UI
       })
       .addCase(saveRecipe.fulfilled, (s, a) => {
         // Optionally sync with items; simplest is to refetch list in UI

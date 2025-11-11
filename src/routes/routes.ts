@@ -67,7 +67,8 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'create',
     path: '/create',
     shortLabel: 'Create',
-    title: 'Add new recipe',
+    title: 'Create recipe',
+    showBack: true,
   },
   {
     key: 'edit',

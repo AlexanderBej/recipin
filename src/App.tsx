@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import ProtectedRoute from './routes/protected-routes';
-import { Layout, Library, Login } from '@pages';
+import { Create, Layout, Library, Login } from '@pages';
 import { initApp } from '@shared/providers';
 import { AppDispatch } from '@store/store';
 import './App.scss';
@@ -35,6 +35,7 @@ function App() {
         }
       >
         <Route index element={<Library />} />
+        <Route path="/create" element={<Create />} />
         {/* <Route path="transactions" element={<Transaction />} />
           <Route path="buckets" element={<BucketsPage />} />
           <Route path="buckets/:type" element={<BucketPage />} />

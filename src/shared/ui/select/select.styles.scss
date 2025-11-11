@@ -1,0 +1,47 @@
+@use '../../../styles/global.scss' as *;
+
+.select-wrapper {
+  position: relative;
+
+  .select-row {
+    position: relative;
+
+    .form-select {
+      appearance: none;
+      background-color: $color-neutral;
+      color: $color-text-primary;
+      // font-size: 16px;
+      padding: $spacing-4 $spacing-5;
+      display: block;
+      width: 100%;
+      border: none;
+      border-radius: $radius-lg;
+      border: 1px solid $color-bg-card-light;
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+      }
+    }
+
+    .select-chevron {
+      position: absolute;
+      right: 14px;
+      bottom: 15px;
+    }
+  }
+
+  .form-select-label {
+    display: block;
+    font-size: 12px;
+    pointer-events: none;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-2;
+  }
+
+  .field-error {
+    font-size: 9px;
+    color: $color-error;
+  }
+}

@@ -1,8 +1,10 @@
 import React from 'react';
 import { IconType } from 'react-icons';
 import clsx from 'clsx';
+import { IoChevronDown } from 'react-icons/io5';
 
 import './select.styles.scss';
+import { RecIcon } from '../icon';
 
 export interface SelectOption {
   value: string | number;
@@ -36,35 +38,38 @@ const Select: React.FC<SelectProps> = ({
   onChange,
   ...otherProps
 }) => {
-  const labelClass = clsx('form-input-label', {
+  const labelClass = clsx('form-select-label', {
     shrink: value,
   });
 
   return (
-    <div className={`group ${customClassName}`}>
+    <div className={`select-wrapper ${customClassName}`}>
       {label && (
         <label className={labelClass} htmlFor={name}>
           {label} {required && <span className="text-red">*</span>}
         </label>
       )}
-      <select
-        className="form-input select-input"
-        name={name}
-        id={name}
-        value={value}
-        required={required}
-        onChange={onChange}
-        {...otherProps}
-      >
-        <option value="" disabled hidden>
-          {label ? `Select ${label}` : 'Select...'}
-        </option>
-        {options.map((opt, index) => (
-          <option key={index} value={opt.value}>
-            {opt.label}
+      <div className="select-row">
+        <select
+          className="form-select"
+          name={name}
+          id={name}
+          value={value}
+          required={required}
+          onChange={onChange}
+          {...otherProps}
+        >
+          <option value="" disabled hidden>
+            {label ? `Select ${label}` : 'Select...'}
           </option>
-        ))}
-      </select>
+          {options.map((opt, index) => (
+            <option key={index} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <RecIcon icon={IoChevronDown} size={18} className="select-chevron" />
+      </div>
 
       {errors && (
         <p className="field-error" id={`err-${name}`}>

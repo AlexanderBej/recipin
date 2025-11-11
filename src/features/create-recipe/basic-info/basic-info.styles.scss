@@ -1,0 +1,21 @@
+@use '../../../styles/global.scss' as *;
+
+.basic-info-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+
+  .prep-row {
+    display: inline-flex;
+    width: 100%;
+    gap: $spacing-3;
+  }
+
+  .tags-label {
+    font-size: 12px;
+    pointer-events: none;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-2;
+  }
+}

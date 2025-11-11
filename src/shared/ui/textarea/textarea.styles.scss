@@ -1,0 +1,44 @@
+@use '../../../styles/global.scss' as *;
+
+.textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.textarea-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $color-text-secondary;
+}
+
+.textarea-field {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid $color-bg-card-light;
+  color: $color-text-primary;
+  background-color: $color-neutral;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  }
+
+  &.textarea-error {
+    border-color: #e53935;
+  }
+}
+
+.textarea-error-message {
+  color: #e53935;
+  font-size: 0.75rem;
+}

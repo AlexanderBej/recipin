@@ -3,14 +3,14 @@
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: $spacing-2;
   width: 100%;
 }
 
 .input-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #333;
+  font-size: 12px;
+  // font-weight: 500;
+  color: $color-text-secondary;
 }
 
 .input-row {
@@ -28,6 +28,7 @@
     padding: $spacing-4 $spacing-5;
     background-color: $color-neutral;
     border: 1px solid $color-bg-card-light;
+    color: $color-text-primary;
     border-radius: $radius-lg;
     font-size: 1rem;
     transition:

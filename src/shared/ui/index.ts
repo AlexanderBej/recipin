@@ -8,3 +8,4 @@ export * from './info-popover';
 export * from './modal';
 export * from './select';
 export * from './spinners';
+export * from './textarea';

@@ -52,7 +52,11 @@ const TopTitleBar: React.FC = () => {
           {actions.map((action) => {
             const meta = getActionMeta(action);
             return (
-              <button className={`action-btn action-btn__${action}`} onClick={meta.action}>
+              <button
+                key={action}
+                className={`action-btn action-btn__${action}`}
+                onClick={meta.action}
+              >
                 <RecIcon icon={meta.icon} size={24} color={getCssVar('--color-text-primary')} />
               </button>
             );
