@@ -1,61 +1,141 @@
 import {
-  addDoc,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
-  onSnapshot,
-  orderBy,
+  writeBatch,
+  deleteDoc,
   query,
-  serverTimestamp,
-  updateDoc,
   where,
+  orderBy,
+  limit,
+  startAfter,
+  serverTimestamp,
+  DocumentData,
+  Timestamp,
 } from 'firebase/firestore';
 
-import { Recipe } from '@api/models/recipes';
 import { db } from '@lib/firebase';
+import { RecipeCard, RecipeEntity } from '@api/models';
+import { CreateRecipeInput } from '@api/types';
 
-const col = collection(db, 'recipes');
+const recipesCol = collection(db, 'recipes');
+const cardsCol = collection(db, 'recipe_cards');
 
-export async function listRecipesByOwner(uid: string) {
-  const q = query(col, where('authorId', '==', uid), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Recipe) }));
+const toMillis = (v: any): number | null =>
+  v && typeof v.toMillis === 'function' ? v.toMillis() : null;
+
+export async function listRecipeCardsByOwnerPaged(
+  uid: string,
+  pageSize = 24,
+  startAfterCreatedAt?: number | null,
+  filters: { category?: string; tag?: string } = {},
+) {
+  const clauses = [where('authorId', '==', uid)];
+
+  if (filters.category) clauses.push(where('category', '==', filters.category));
+  if (filters.tag) clauses.push(where('tags', 'array-contains', filters.tag));
+  const base = query(cardsCol, ...clauses, orderBy('createdAt', 'desc'), limit(pageSize));
+
+  const q =
+    startAfterCreatedAt != null
+      ? query(base, startAfter(Timestamp.fromMillis(startAfterCreatedAt)))
+      : base;
+
+  try {
+    const snap = await getDocs(q);
+
+    const items: RecipeCard[] = snap.docs.map((d) => {
+      const x = d.data() as any;
+      return {
+        id: d.id,
+        authorId: x.authorId,
+        title: x.title,
+        category: x.category,
+        tags: x.tags ?? [],
+        difficulty: x.difficulty ?? null,
+        imageUrl: x.imageUrl ?? null,
+        excerpt: x.excerpt ?? null,
+        createdAt: toMillis(x.createdAt),
+        updatedAt: toMillis(x.updatedAt),
+      };
+    });
+
+    const last = snap.docs.at(-1);
+    const nextStartAfter = last ? toMillis((last.data() as any).createdAt) : null;
+
+    return { items, nextStartAfter };
+  } catch (e) {
+    console.error('[cards paged] query failed:', e);
+    throw e;
+  }
 }
 
-export async function getRecipe(id: string) {
-  const ref = doc(db, 'recipes', id);
+export async function getRecipe(id: string): Promise<RecipeEntity | null> {
+  const ref = doc(recipesCol, id);
   const snap = await getDoc(ref);
-  return snap.exists() ? { id: snap.id, ...(snap.data() as Recipe) } : null;
+  if (!snap.exists()) return null;
+  const d = snap.data() as any;
+  return {
+    id: snap.id,
+    authorId: d.authorId,
+    title: d.title,
+    category: d.category,
+    tags: d.tags ?? [],
+    difficulty: d.difficulty ?? null,
+    imageUrl: d.imageUrl ?? null,
+    excerpt: d.excerpt ?? null,
+    description: d.description ?? '',
+    ingredients: d.ingredients ?? [],
+    steps: d.steps ?? [],
+    servings: d.servings,
+    prepMinutes: d.prepMinutes,
+    cookMinutes: d.cookMinutes,
+    isPublic: !!d.isPublic,
+    createdAt: toMillis(d.createdAt),
+    updatedAt: toMillis(d.updatedAt),
+  };
 }
 
-export async function addRecipe(data: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) {
-  const res = await addDoc(col, {
-    ...data,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    isPublic: false,
-  });
-  return res.id;
+export async function addRecipePair(data: CreateRecipeInput) {
+  const batch = writeBatch(db);
+  const recipeRef = doc(recipesCol); // generate ID once
+  const cardRef = doc(cardsCol, recipeRef.id); // reuse same ID
+
+  const now = { createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+
+  const recipeDoc: DocumentData = { ...data, ...now, isPublic: data.isPublic ?? false };
+  batch.set(recipeRef, recipeDoc);
+
+  const cardDoc: DocumentData = {
+    authorId: data.authorId,
+    title: data.title,
+    category: data.category,
+    tags: data.tags ?? [],
+    difficulty: data.difficulty ?? null,
+    imageUrl: data.imageUrl ?? null,
+    excerpt: (data.description ?? '').slice(0, 140),
+    ...now,
+  };
+  batch.set(cardRef, cardDoc);
+
+  await batch.commit();
+
+  // Return a UI-ready card so the list can update instantly
+  const card: RecipeCard = {
+    id: recipeRef.id,
+    authorId: cardDoc.authorId,
+    title: cardDoc.title,
+    category: cardDoc.category,
+    tags: cardDoc.tags,
+    ...cardDoc,
+    createdAt: null, // server sets it; you can refetch page or leave null until next load
+    updatedAt: null,
+  };
+
+  return { id: recipeRef.id, card };
 }
 
-export async function updateRecipe(id: string, data: Partial<Recipe>) {
-  const ref = doc(db, 'recipes', id);
-  await updateDoc(ref, { ...data, updatedAt: serverTimestamp() });
-}
-
-export async function deleteRecipe(id: string) {
-  await deleteDoc(doc(db, 'recipes', id));
-}
-
-export function onUserRecipesSnapshot(uid: string, cb: (recipes: Recipe[]) => void) {
-  const col = collection(db, 'recipes');
-  const q = query(col, where('authorId', '==', uid), orderBy('createdAt', 'desc'));
-
-  // returns unsubscribe
-  return onSnapshot(q, (snap) => {
-    const items: Recipe[] = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Recipe) }));
-    cb(items);
-  });
+export async function deleteRecipePair(id: string) {
+  await Promise.all([deleteDoc(doc(recipesCol, id)), deleteDoc(doc(cardsCol, id))]);
 }

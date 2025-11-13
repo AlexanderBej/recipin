@@ -1,4 +1,6 @@
+export * from './bottom-sheet';
 export * from './button';
+export * from './chip';
 export * from './checkbox-input';
 export * from './dropdown';
 export * from './expansion-row';

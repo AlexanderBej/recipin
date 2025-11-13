@@ -1,0 +1,12 @@
+@use '../../styles/global.scss' as *;
+
+.favorite-card {
+  width: 135px;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+
+  .favorite-image {
+    width: 100%;
+    border-radius: $radius-md;
+  }
+}

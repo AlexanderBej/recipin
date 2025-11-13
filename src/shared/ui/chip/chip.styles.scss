@@ -1,0 +1,17 @@
+@use '../../../styles/global.scss' as *;
+
+.chip {
+  padding: $spacing-2 $spacing-3;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 14px;
+
+  &__active {
+    background-color: $color-primary-dark;
+    color: $color-text-primary;
+  }
+}

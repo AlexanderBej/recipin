@@ -1,23 +1,45 @@
-// @use './../../styles/tokens.scss' as *;
+@use '../../styles/global.scss' as *;
 
-// .login-contaier {
-//   width: 400px;
-//   padding: 20px;
-//   margin: 150px auto;
-//   height: 300px;
-//   background-color: $color-bg-card;
-//   box-shadow: $shadow-md;
-//   border-radius: $radius-md;
+.library-contaier {
+  width: 100%;
+  overflow-x: hidden;
 
-//   .login-btn-container {
-//     display: flex;
+  .tags-container {
+    margin-top: $spacing-4;
+  }
 
-//     .login-btn {
-//       display: inline-flex;
-//       align-items: center;
-//       justify-content: center;
-//       gap: $spacing-4;
-//       margin: 80px auto;
-//     }
-//   }
-// }
+  .favorites-list {
+    margin-top: $spacing-4;
+
+    .recipes-list {
+      display: flex;
+      gap: $spacing-3;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: $spacing-2; // space for scrollbar (optional)
+      scroll-snap-type: x mandatory;
+    }
+
+    .recipes-list > * {
+      flex: 0 0 135px; // no grow, no shrink, 135px basis
+      min-width: 135px; // belt-and-suspenders
+      max-width: 135px;
+      scroll-snap-align: start; // optional
+    }
+  }
+
+  .all-recipes-list {
+    margin-top: $spacing-8;
+
+    h3 {
+      margin-bottom: $spacing-3;
+    }
+    .recipes-list {
+      display: grid;
+      width: 100%;
+      gap: $spacing-4;
+    }
+  }
+}

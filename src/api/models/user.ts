@@ -3,7 +3,7 @@ export type MinimalUser = {
   displayName: string | null;
   email: string | null;
   photoURL: string | null;
-  createdAt: Date;
+  createdAt: string;
 };
 
 export interface UserProfile {

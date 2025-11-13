@@ -11,12 +11,11 @@ import {
   Steps,
   StepSlide,
 } from '@features/create-recipe';
-import { AppDispatch } from '@api/types';
+import { AppDispatch, CreateRecipeInput } from '@api/types';
+import { createRecipe } from '@store/recipes-store';
+import { selectAuthUserId } from '@store/auth-store';
 
 import './create.styles.scss';
-import { createRecipe } from '@store/recipes-store';
-import { Recipe } from '@api/models';
-import { selectAuthUserId } from '@store/auth-store';
 
 const Create: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -88,7 +87,7 @@ const Create: React.FC = () => {
     e.preventDefault();
     console.log(e);
     if (!userId) return;
-    const payload: Recipe = {
+    const payload: CreateRecipeInput = {
       title: formData.title,
       authorId: userId,
       category: formData.category,
@@ -103,7 +102,7 @@ const Create: React.FC = () => {
       difficulty: formData.difficulty,
     };
 
-    dispatch(createRecipe({ data: payload })).unwrap();
+    dispatch(createRecipe(payload)).unwrap();
   };
 
   return (

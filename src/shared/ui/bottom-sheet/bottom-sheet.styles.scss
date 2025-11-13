@@ -1,0 +1,119 @@
+@use '../../../styles/global.scss' as *;
+
+.bs__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: saturate(120%) blur(2px);
+  animation: bs-overlay-in 150ms ease forwards;
+}
+@keyframes bs-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sheet container */
+.bs {
+  --pad-x: 16px;
+  --pad-y: 12px;
+
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 640px; /* centers on large screens */
+  background: $color-bg-card-light;
+  border-top-left-radius: $radius-lg;
+  border-top-right-radius: $radius-lg;
+  box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.25);
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  row-gap: 6px;
+
+  transform: translateY(100%);
+  animation: bs-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes bs-in {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Size variants */
+.bs--auto {
+  min-height: 35vh;
+  max-height: 88vh;
+}
+.bs--tall {
+  min-height: 80vh;
+  max-height: 92vh;
+}
+.bs--fullscreen {
+  height: 100vh;
+  max-height: 100vh;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* Handle */
+.bs__handle {
+  width: 44px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 999px;
+  margin: 8px auto 0;
+}
+
+/* Header */
+.bs__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px var(--pad-x) 0;
+}
+.bs__title {
+  font-weight: 700;
+  font-size: 16px;
+}
+.bs__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.bs__close {
+  background: none;
+  border: 0;
+  padding: 6px;
+  font-size: 18px;
+  border-radius: 8px;
+}
+.bs__close:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Body (scroll area) */
+.bs__body {
+  overflow: auto;
+  padding: 4px var(--pad-x) 0;
+}
+
+/* Footer */
+.bs__footer {
+  padding: 8px var(--pad-x) 16px;
+  // background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .bs,
+  .bs__overlay {
+    animation: none !important;
+  }
+}

@@ -2,18 +2,16 @@ import React from 'react';
 
 import { CreateRecipeForm, StepThreeProps } from '../create-recipe.misc';
 import { Input, Select, SelectOption, Textarea } from '@shared/ui';
-import { CATEGORY_LABELS } from '@api/misc';
+import { CATEGORY_META } from '@api/misc';
 import { TagChips } from '@components';
 
 import './basic-info.styles.scss';
 
 const BasicInfo: React.FC<StepThreeProps> = ({ formData, handleChange, setFormData }) => {
-  const CATEGORY_OPTIONS: SelectOption[] = Object.entries(CATEGORY_LABELS).map(
-    ([value, label]) => ({
-      value: value,
-      label,
-    }),
-  );
+  const CATEGORY_OPTIONS: SelectOption[] = Object.entries(CATEGORY_META).map(([value, label]) => ({
+    value: value,
+    label: label.label,
+  }));
 
   const DIFFICULTY_OPTIONS: SelectOption[] = [
     { value: 'easy', label: 'Easy' },

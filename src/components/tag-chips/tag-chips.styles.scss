@@ -1,36 +1,52 @@
 @use '../../styles/global.scss' as *;
 
+.tag-chips {
+  width: 100%;
+
+  .tags-header {
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    gap: $spacing-3;
+
+    span {
+      font-size: 12px;
+      pointer-events: none;
+      color: $color-text-secondary;
+    }
+  }
+
+  .selected-chips-list {
+    margin-top: $spacing-4;
+    justify-content: flex-start;
+  }
+}
+
+.chips-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  .main-chips-list {
+    margin-bottom: 0;
+  }
+}
+
 .chips-container {
   width: 100%;
-  overflow-x: hidden;
 
   .chip-type-label {
     font-size: $size-xsmall;
     font-weight: bold;
   }
-
-  .chip-list {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: $spacing-2;
-    padding: $spacing-2 0;
-    margin-bottom: $spacing-3;
-
-    .chip {
-      padding: $spacing-2 $spacing-3;
-      background-color: $color-bg-card;
-      border-radius: $radius-md;
-      color: $color-text-secondary;
-      display: flex;
-      align-items: center;
-      white-space: nowrap;
-      font-size: 14px;
-
-      &__active {
-        background-color: $color-primary-dark;
-        color: $color-text-primary;
-      }
-    }
-  }
+}
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  padding: $spacing-2 0;
+  margin-bottom: $spacing-3;
+  scrollbar-width: none;
+  justify-content: center;
 }

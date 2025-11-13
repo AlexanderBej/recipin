@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import clsx from 'clsx';
+import { IoChevronDown } from 'react-icons/io5';
 
 import { TAGS } from '@api/misc';
 import { TagCategory } from '@api/types';
+import { BottomSheet, Chip, RecIcon } from '@shared/ui';
 
 import './tag-chips.styles.scss';
 
@@ -19,47 +21,66 @@ const TagChips: React.FC<TagChipsProps> = ({ selected, onChange, categories }) =
 
   const toggle = useCallback(
     (tag: string) => {
-      const set = new Set(selected);
-      if (set.has(tag)) set.delete(tag);
-      else set.add(tag);
-      onChange([...set]);
+      const next = selected.includes(tag) ? selected.filter((t) => t !== tag) : [...selected, tag];
+
+      onChange(next);
     },
     [selected, onChange],
   );
 
-  useEffect(() => {
-    console.log('selected', selected);
-  }, [selected]);
-
-  const labelForCategory = (category: TagCategory): string => {
-    switch (category) {
-      case 'cuisine':
-        return 'Cuisine';
-      case 'dietary':
-        return 'Dietary';
-      case 'method':
-        return 'Method';
-      case 'occasion':
-        return 'Occasion';
-      case 'time':
-        return 'Time';
-      default:
-        return category;
-    }
+  const labelToCamelCase = (word: string) => {
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
   };
 
   return (
     <div className="tag-chips" role="group" aria-label="Recipe tags">
-      {cats.map((category) => (
-        <div className="chips-container" key={category}>
-          <span className="chip-type-label">{labelForCategory(category)}</span>
-          <div className="chip-list">
-            {TAGS[category].map((tag) => {
+      <div className="tags-header">
+        <span>Tags</span>
+        <BottomSheet
+          trigger={
+            <button type="button" aria-label="Expand to show all tags">
+              <RecIcon icon={IoChevronDown} size={12} className="expand" />
+            </button>
+          }
+          title="All tags"
+          size="tall"
+          showHandle
+        >
+          {cats.map((category) => {
+            // Filter out any tag that already appears in MAIN_TAGS to avoid duplicates
+            const tags = TAGS[category] as readonly string[];
+            // const tags = list.filter((t: string) => !mainSet.has(t));
+
+            if (tags.length === 0) return null;
+            return (
+              <div className="chips-container" key={category}>
+                <span className="chip-type-label">{labelToCamelCase(category)}</span>
+                <div className="chip-list">
+                  {tags.map((tag) => {
+                    const active = isSelected(tag);
+                    return (
+                      <Chip
+                        tag={tag}
+                        onToggle={toggle}
+                        active={active}
+                        key={`${category}:${tag}`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </BottomSheet>
+      </div>
+      {selected && selected.length > 0 && (
+        <div className="chips-row">
+          <div className="selected-chips-list chip-list" aria-label="Selected tags">
+            {selected.map((tag) => {
               const active = isSelected(tag);
-              <div className="chip">{tag}</div>;
               return (
                 <button
-                  key={`${category}:${tag}`}
+                  key={tag}
                   type="button"
                   className={clsx('chip', { chip__active: active })}
                   aria-pressed={active}
@@ -71,7 +92,7 @@ const TagChips: React.FC<TagChipsProps> = ({ selected, onChange, categories }) =
             })}
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import { MEASURING_UNITS, TAGS } from '@api/misc';
+import { RecipeEntity } from '@api/models';
+import { FieldValue, Timestamp } from 'firebase/firestore';
 
 export type RecipeCategory =
   | 'breakfast'
@@ -26,8 +28,22 @@ export type RecipeCategory =
 
 export type RecipeDifficulty = 'easy' | 'intermediate' | 'advanced';
 
-export type TagCategory = keyof typeof TAGS;
+export type TagCategory = 'cuisine' | 'dietary' | 'method' | 'occasion' | 'time';
 export type TagValue = (typeof TAGS)[TagCategory][number];
 
 export type MeasuringUnitCategory = keyof typeof MEASURING_UNITS;
 export type MeasuringUnit = (typeof MEASURING_UNITS)[MeasuringUnitCategory][number];
+
+export type FireDate = Timestamp | FieldValue | null | undefined;
+
+// export type RecipeCardDoc = Omit<RecipeCard, 'createdAt' | 'updatedAt'> & {
+//   createdAt?: FireDate;
+//   updatedAt?: FireDate;
+// };
+
+// export type RecipeDoc = Omit<Recipe, 'id'> & {
+//   createdAt?: FireDate;
+//   updatedAt?: FireDate;
+// };
+
+export type CreateRecipeInput = Omit<RecipeEntity, 'id' | 'createdAt' | 'updatedAt'>;

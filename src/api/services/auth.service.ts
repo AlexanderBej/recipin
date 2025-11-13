@@ -1,7 +1,7 @@
-import { signInWithPopup, User } from 'firebase/auth';
+import { signInWithPopup, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-import { UserProfile } from '@api/models';
+import { MinimalUser, UserProfile } from '@api/models';
 import { auth, db, googleProvider } from '@lib/firebase';
 
 export async function signInWithGoogle() {
@@ -9,7 +9,10 @@ export async function signInWithGoogle() {
   return result.user; // FirebaseUser
 }
 
-export const ensureUserProfile = async (userAuth: User, overrides: Partial<UserProfile> = {}) => {
+export const ensureUserProfile = async (
+  userAuth: FirebaseUser,
+  overrides: Partial<UserProfile> = {},
+) => {
   if (!userAuth) return;
 
   const ref = doc(db, 'users', userAuth.uid);
@@ -29,3 +32,13 @@ export const ensureUserProfile = async (userAuth: User, overrides: Partial<UserP
 
   return ref;
 };
+
+export const mapFirebaseUser = (fbUser: FirebaseUser): MinimalUser => ({
+  uid: fbUser.uid,
+  displayName: fbUser.displayName,
+  createdAt: fbUser.metadata?.creationTime
+    ? new Date(fbUser.metadata.creationTime).toISOString()
+    : new Date().toISOString(),
+  email: fbUser.email,
+  photoURL: fbUser.photoURL,
+});

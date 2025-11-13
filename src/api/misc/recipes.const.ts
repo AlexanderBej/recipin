@@ -1,28 +1,59 @@
-import { RecipeCategory } from '@api/types';
+import { IconType } from 'react-icons';
+import { LuEggFried } from 'react-icons/lu';
+import { MdOutlineLunchDining } from 'react-icons/md';
+import { MdOutlineDinnerDining } from 'react-icons/md';
+import { LuApple } from 'react-icons/lu';
+import { FaLeaf } from 'react-icons/fa';
+import { MdOutlineSoupKitchen } from 'react-icons/md';
+import { LuSalad } from 'react-icons/lu';
+import { LuWheat } from 'react-icons/lu';
+import { PiBreadBold } from 'react-icons/pi';
+import { LuCroissant } from 'react-icons/lu';
+import { CiBowlNoodles } from 'react-icons/ci';
+import { FaBowlRice } from 'react-icons/fa6';
+import { TbMeat } from 'react-icons/tb';
+import { IoFishOutline } from 'react-icons/io5';
+import { LuCarrot } from 'react-icons/lu';
+import { GiTomato } from 'react-icons/gi';
+import { CiIceCream } from 'react-icons/ci';
+import { MdOutlineCake } from 'react-icons/md';
+import { MdOutlineCookie } from 'react-icons/md';
+import { RiDrinks2Fill } from 'react-icons/ri';
+import { GiKetchup } from 'react-icons/gi';
+import { GiCoolSpices } from 'react-icons/gi';
 
-export const CATEGORY_LABELS: Record<RecipeCategory, string> = {
-  breakfast: 'Breakfast',
-  lunch: 'Lunch',
-  dinner: 'Dinner',
-  snacks: 'Snacks',
-  appetizers: 'Appetizers',
-  'soups-stews': 'Soups & Stews',
-  salads: 'Salads',
-  sides: 'Sides',
-  'flatbreads-breads': 'Flatbreads & Breads',
-  'pastries-doughs': 'Pastries & Doughs',
-  'pasta-noodles': 'Pasta & Noodles',
-  'rice-grains': 'Rice & Grains',
-  'meat-dishes': 'Meat Dishes',
-  'seafood-dishes': 'Seafood Dishes',
-  'vegetarian-mains': 'Vegetarian Mains',
-  'vegan-mains': 'Vegan Mains',
-  desserts: 'Desserts',
-  'cakes-muffins': 'Cakes & Muffins',
-  'cookies-bars': 'Cookies & Bars',
-  'drinks-smoothies': 'Drinks & Smoothies',
-  'sauces-condiments': 'Sauces & Condiments',
-  'spice-mixes-marinades': 'Spice Mixes & Marinades',
+import { RecipeCategory, TagCategory } from '@api/types';
+
+export const CATEGORY_META: Record<
+  RecipeCategory,
+  { label: string; icon: IconType; color: string }
+> = {
+  breakfast: { label: 'Breakfast', icon: LuEggFried, color: '#FBBF24' }, // amber-400
+  lunch: { label: 'Lunch', icon: MdOutlineLunchDining, color: '#F59E0B' }, // amber-500
+  dinner: { label: 'Dinner', icon: MdOutlineDinnerDining, color: '#F87171' }, // red-400
+  snacks: { label: 'Snacks', icon: LuApple, color: '#FB923C' }, // orange-400
+  appetizers: { label: 'Appetizers', icon: FaLeaf, color: '#4ADE80' }, // green-400
+  'soups-stews': { label: 'Soups & Stews', icon: MdOutlineSoupKitchen, color: '#60A5FA' }, // blue-400
+  salads: { label: 'Salads', icon: LuSalad, color: '#34D399' }, // emerald-400
+  sides: { label: 'Sides', icon: LuWheat, color: '#A3E635' }, // lime-400
+  'flatbreads-breads': { label: 'Flatbreads & Breads', icon: PiBreadBold, color: '#FCD34D' },
+  'pastries-doughs': { label: 'Pastries & Doughs', icon: LuCroissant, color: '#F9A8D4' },
+  'pasta-noodles': { label: 'Pasta & Noodles', icon: CiBowlNoodles, color: '#F97316' },
+  'rice-grains': { label: 'Rice & Grains', icon: FaBowlRice, color: '#84CC16' },
+  'meat-dishes': { label: 'Meat Dishes', icon: TbMeat, color: '#F87171' },
+  'seafood-dishes': { label: 'Seafood Dishes', icon: IoFishOutline, color: '#38BDF8' },
+  'vegetarian-mains': { label: 'Vegetarian Mains', icon: LuCarrot, color: '#22C55E' },
+  'vegan-mains': { label: 'Vegan Mains', icon: GiTomato, color: '#16A34A' },
+  desserts: { label: 'Desserts', icon: CiIceCream, color: '#F472B6' },
+  'cakes-muffins': { label: 'Cakes & Muffins', icon: MdOutlineCake, color: '#FB7185' },
+  'cookies-bars': { label: 'Cookies & Bars', icon: MdOutlineCookie, color: '#FDBA74' },
+  'drinks-smoothies': { label: 'Drinks & Smoothies', icon: RiDrinks2Fill, color: '#60A5FA' },
+  'sauces-condiments': { label: 'Sauces & Condiments', icon: GiKetchup, color: '#FBBF24' },
+  'spice-mixes-marinades': {
+    label: 'Spice Mixes & Marinades',
+    icon: GiCoolSpices,
+    color: '#FACC15',
+  },
 };
 
 export const TAGS = {
@@ -61,7 +92,9 @@ export const TAGS = {
     'Kids Friendly',
   ],
   time: ['15-Minute', '30-Minute', 'One-Pot'],
-} as const;
+} satisfies Record<TagCategory, readonly string[]>;
+
+export const MAIN_TAGS = ['Italian', 'Low-Carb', '30-Minute', 'Air Fryer'];
 
 export const MEASURING_UNITS = {
   volume: ['mL', 'L', 'tsp', 'tbsp', 'fl oz', 'cup', 'pint', 'quart', 'gallon'],
