@@ -36,14 +36,6 @@ export type MeasuringUnit = (typeof MEASURING_UNITS)[MeasuringUnitCategory][numb
 
 export type FireDate = Timestamp | FieldValue | null | undefined;
 
-// export type RecipeCardDoc = Omit<RecipeCard, 'createdAt' | 'updatedAt'> & {
-//   createdAt?: FireDate;
-//   updatedAt?: FireDate;
-// };
-
-// export type RecipeDoc = Omit<Recipe, 'id'> & {
-//   createdAt?: FireDate;
-//   updatedAt?: FireDate;
-// };
+export type RatingCategory = 'taste' | 'ease' | 'health' | 'presentation' | 'value';
 
 export type CreateRecipeInput = Omit<RecipeEntity, 'id' | 'createdAt' | 'updatedAt'>;

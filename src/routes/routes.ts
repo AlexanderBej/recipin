@@ -61,7 +61,9 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'recipe',
     path: '/recipe/:id',
     shortLabel: 'Details',
-    title: ({ params }) => 'Recipe details', // or fetch recipe name via store and override via prop
+    title: 'Recipe details',
+    showBack: true,
+    actions: ['edit'],
   },
   {
     key: 'create',

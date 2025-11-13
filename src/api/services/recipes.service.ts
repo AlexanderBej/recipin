@@ -13,11 +13,12 @@ import {
   serverTimestamp,
   DocumentData,
   Timestamp,
+  setDoc,
 } from 'firebase/firestore';
 
 import { db } from '@lib/firebase';
 import { RecipeCard, RecipeEntity } from '@api/models';
-import { CreateRecipeInput } from '@api/types';
+import { CreateRecipeInput, RatingCategory } from '@api/types';
 
 const recipesCol = collection(db, 'recipes');
 const cardsCol = collection(db, 'recipe_cards');
@@ -138,4 +139,12 @@ export async function addRecipePair(data: CreateRecipeInput) {
 
 export async function deleteRecipePair(id: string) {
   await Promise.all([deleteDoc(doc(recipesCol, id)), deleteDoc(doc(cardsCol, id))]);
+}
+
+export async function saveMyRating(
+  recipeId: string,
+  cats: Partial<Record<RatingCategory, number>>,
+) {
+  await setDoc(doc(db, 'recipes', recipeId), { ratingCategories: cats }, { merge: true });
+  return { cats, id: recipeId };
 }

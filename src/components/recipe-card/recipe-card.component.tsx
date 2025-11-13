@@ -1,13 +1,14 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router';
 
 import { RecipeCard as RecipeCardModel } from '@api/models';
-
-import './recipe-card.styles.scss';
 import { CATEGORY_META } from '@api/misc';
 import { Chip, RecIcon } from '@shared/ui';
 import { RecipeDifficulty } from '@api/types';
 import { getCssVar } from '@shared/utils';
+
+import './recipe-card.styles.scss';
 const placeholderImage = require('../../assets/img_placeholder.png');
 
 interface RecipeCardProps {
@@ -15,6 +16,8 @@ interface RecipeCardProps {
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+  const navigate = useNavigate();
+
   const getDifColor = (dif: RecipeDifficulty | undefined): string => {
     return dif === 'easy'
       ? getCssVar('--color-success')
@@ -24,7 +27,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   };
 
   return (
-    <div className="recipe-card">
+    <div className="recipe-card" onClick={() => navigate(`/recipe/${recipe.id}`)}>
       <img
         className="recipe-image"
         src={recipe?.imageUrl ?? placeholderImage}
@@ -51,7 +54,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         </div>
         <div className="tags-container">
           {recipe.tags.map((tag) => (
-            <Chip tag={tag} onToggle={() => {}} active={true} className="card-tag" />
+            <Chip key={tag} tag={tag} onToggle={() => {}} active={true} className="card-tag" />
           ))}
         </div>
       </div>

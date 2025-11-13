@@ -22,7 +22,7 @@ import { RiDrinks2Fill } from 'react-icons/ri';
 import { GiKetchup } from 'react-icons/gi';
 import { GiCoolSpices } from 'react-icons/gi';
 
-import { RecipeCategory, TagCategory } from '@api/types';
+import { RatingCategory, RecipeCategory, TagCategory } from '@api/types';
 
 export const CATEGORY_META: Record<
   RecipeCategory,
@@ -124,3 +124,13 @@ export const MEASURING_UNITS_ALL = [
   'pinch',
   'dash',
 ];
+
+export const RATING_CATEGORIES: RatingCategory[] = [
+  'taste',
+  'ease',
+  'health',
+  'presentation',
+  'value',
+];
+export const MAX_PER_CATEGORY = 5;
+export const MAX_TOTAL = RATING_CATEGORIES.length * MAX_PER_CATEGORY;

@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import ProtectedRoute from './routes/protected-routes';
-import { Create, Layout, Library, Login } from '@pages';
+import { Create, Layout, Library, Login, RecipeDetails } from '@pages';
 import { initApp } from '@shared/providers';
 import { AppDispatch } from '@store/store';
 import './App.scss';
@@ -18,14 +18,6 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      {/* <Route
-          path="onboarding"
-          element={
-            <ProtectedRoute>
-              <Onboarding />
-            </ProtectedRoute>
-          }
-        />*/}
       <Route
         path="/"
         element={
@@ -36,17 +28,7 @@ function App() {
       >
         <Route index element={<Library />} />
         <Route path="/create" element={<Create />} />
-        {/* <Route path="transactions" element={<Transaction />} />
-          <Route path="buckets" element={<BucketsPage />} />
-          <Route path="buckets/:type" element={<BucketPage />} />
-          <Route path="insights" element={<Insights />} />
-          <Route path="history" element={<History />} />
-          <Route path="settings" element={<SettingsLayout />}>
-            <Route index element={<SettingsShell />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="budget" element={<BudgetPage />} />
-            <Route path="app" element={<AppPreferencesPage />} />
-          </Route> */}
+        <Route path="/recipe/:id" element={<RecipeDetails />} />
       </Route>
     </Routes>
   );
