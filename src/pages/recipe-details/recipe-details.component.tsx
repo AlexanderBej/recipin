@@ -1,27 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router';
+import { v4 as uuidv4 } from 'uuid';
 import { FaPlus } from 'react-icons/fa';
 import { FaMinus } from 'react-icons/fa';
 import { FaRegClock } from 'react-icons/fa';
 import { IoFlash } from 'react-icons/io5';
+import { MdOutlineLocalGroceryStore } from 'react-icons/md';
+import { MdLocalGroceryStore } from 'react-icons/md';
 
-import { RecipeEntity } from '@api/models';
-import { AppDispatch, RecipeDifficulty } from '@api/types';
-import { fetchRecipeById } from '@store/recipes-store';
+import { selectRecipesCurrent } from '@store/recipes-store';
 import { Chip, RecIcon } from '@shared/ui';
-import { formatHoursAndMinutes, getCssVar } from '@shared/utils';
+import { buildIngredient, formatHoursAndMinutes, getCssVar, toDateOrNull } from '@shared/utils';
+import { CATEGORY_META } from '@api/misc';
+import { RatingsSheet } from '@components';
+import { GroceryItem } from '@api/models';
+import { AppDispatch } from '@api/types';
+import { addGroceryRecipe, makeSelectHasGroceryRecipe } from '@store/grocery-store';
 
 import './recipe-details.styles.scss';
-import { CATEGORY_META } from '@api/misc';
-import { format } from 'date-fns';
 const placeholderImage = require('../../assets/img_placeholder.png');
 
 const RecipeDetails: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
-  const [recipe, setRecipe] = useState<RecipeEntity | null>(null);
+  const recipe = useSelector(selectRecipesCurrent);
+  const isRecipeInGrocery = useSelector(makeSelectHasGroceryRecipe(recipe?.id ?? ''));
+
   const [portions, setPortions] = useState<number>(recipe?.servings ?? 1);
 
   const prepTime = formatHoursAndMinutes(recipe?.cookMinutes ?? 1);
@@ -31,21 +38,30 @@ const RecipeDetails: React.FC = () => {
   const difficultyNum =
     recipe?.difficulty === 'easy' ? 1 : recipe?.difficulty === 'advanced' ? 3 : 2;
 
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchRecipeById(id))
-        .unwrap()
-        .then((rec) => {
-          setRecipe(rec);
-          setPortions(rec?.servings ?? 2);
-          console.log('full rec', rec);
-        });
-    }
-  }, [id, dispatch]);
+  const icon = isRecipeInGrocery ? MdLocalGroceryStore : MdOutlineLocalGroceryStore;
+  const iconColor = isRecipeInGrocery ? '--color-primary' : '--color-text-primary';
 
-  // const formatDiffCard = (diff: RecipeDifficulty | undefined): string => {
-  //   return diff === 'easy' ? 'Easy' : diff === 'advanced' ? 'Hard' : 'Inter';
-  // };
+  console.log('recipe', recipe);
+
+  const handleAddToGrocery = () => {
+    if (recipe) {
+      const groceryItems: GroceryItem[] = recipe?.ingredients.map((rec) => {
+        return {
+          id: uuidv4(),
+          name: rec.item,
+          quantity: rec.quantity,
+          unit: rec.unit,
+          checked: false,
+          sourceRecipeId: [recipe.id],
+        };
+      });
+
+      dispatch(addGroceryRecipe({ items: groceryItems, recipeId: recipe.id, title: recipe.title }));
+      navigate('/grocery');
+    }
+  };
+
+  const updatedAtDate = toDateOrNull(recipe?.updatedAt);
 
   return (
     <div className="recipe-details">
@@ -85,7 +101,6 @@ const RecipeDetails: React.FC = () => {
               <RecIcon key={i} icon={IoFlash} size={18} color={getCssVar('--color-primary')} />
             ))}
           </div>
-          {/* <span>{formatDiffCard(recipe?.difficulty)}</span> */}
         </div>
       </div>
 
@@ -110,27 +125,45 @@ const RecipeDetails: React.FC = () => {
         <h3 className="container-heading">Description</h3>
         <p>{recipe?.description}</p>
         <p className="last-update">
-          Last updated: {format(new Date(recipe?.updatedAt ?? ''), 'MMMM do, yyyy')}
+          {updatedAtDate
+            ? `Last updated: ${format(updatedAtDate, 'MMMM do, yyyy')}`
+            : 'Last updated: —'}
         </p>
       </div>
 
       <hr className="divider" />
       <div className="ingredients-container">
-        <h3 className="container-heading">Ingredients</h3>
+        <div className="ingredients-heading">
+          <h3 className="container-heading">Ingredients</h3>
+          <button type="button" onClick={() => handleAddToGrocery()}>
+            <RecIcon icon={icon} size={24} color={getCssVar(iconColor)} />
+          </button>
+        </div>
         <ul>
           {recipe?.ingredients.map((ingr, index) => (
-            <li key={index}>{ingr.item}</li>
+            <li key={index}>{buildIngredient(ingr)}</li>
           ))}
         </ul>
       </div>
 
+      <hr className="divider" />
       <div className="steps-container">
         <h3 className="container-heading">Steps</h3>
-        <ul>
+        <ol>
           {recipe?.steps.map((step, index) => (
             <li key={index}>{step}</li>
           ))}
-        </ul>
+        </ol>
+      </div>
+
+      <hr className="divider" />
+      <div
+        className="ratings-container"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <h3 className="container-heading">Rating</h3>
+        <RatingsSheet recipeId={recipe?.id ?? ''} ratingCategories={recipe?.ratingCategories} />
       </div>
     </div>
   );

@@ -1,20 +1,24 @@
-// @use '../../../styles/tokens.scss' as *;
+@use '../../../styles/global.scss' as *;
 
-// .dropdown-container {
-//   display: inline-block;
-//   position: relative;
+.dropdown-container {
+  display: inline-block;
+  position: relative;
+  background-color: rgba($color-primary, 40%);
+  border-radius: $radius-md;
+  min-width: 100px;
 
-//   .dropdown-menu {
-//     position: absolute;
-//     top: 100%;
-//     right: 0;
-//     z-index: 1;
-//     min-width: 100px;
-//     @include themed(background-color, color-bg-card, $color-bg-card);
-//     border-radius: $radius-sm;
-//     display: flex;
-//     flex-direction: column;
-//     gap: 10px;
-//     padding: $spacing-4;
-//   }
-// }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 1;
+    min-width: 150px;
+    background-color: $color-bg-card;
+    border-radius: $radius-md;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: $spacing-4;
+    width: max-content;
+  }
+}

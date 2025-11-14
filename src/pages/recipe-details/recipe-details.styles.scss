@@ -13,8 +13,8 @@
       border-radius: $radius-lg;
       background: linear-gradient(
         180deg,
-        rgba($color-bg-card, 0) 70%,
-        rgba($color-bg-card, 1) 100%
+        rgba($color-bg-main, 0) 70%,
+        rgba($color-bg-main, 1) 100%
       );
     }
 
@@ -89,6 +89,7 @@
 
   .container-heading {
     margin-bottom: $spacing-3;
+    color: $color-primary;
   }
 
   .tags-row {
@@ -98,5 +99,12 @@
     flex-wrap: wrap;
     gap: 12px;
     margin: 24px 0;
+  }
+
+  .ingredients-heading {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
   }
 }

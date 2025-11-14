@@ -14,6 +14,7 @@ import {
   DocumentData,
   Timestamp,
   setDoc,
+  updateDoc,
 } from 'firebase/firestore';
 
 import { db } from '@lib/firebase';
@@ -57,6 +58,7 @@ export async function listRecipeCardsByOwnerPaged(
         difficulty: x.difficulty ?? null,
         imageUrl: x.imageUrl ?? null,
         excerpt: x.excerpt ?? null,
+        ratingCategories: x.ratingCategories ?? null,
         createdAt: toMillis(x.createdAt),
         updatedAt: toMillis(x.updatedAt),
       };
@@ -93,6 +95,7 @@ export async function getRecipe(id: string): Promise<RecipeEntity | null> {
     prepMinutes: d.prepMinutes,
     cookMinutes: d.cookMinutes,
     isPublic: !!d.isPublic,
+    ratingCategories: d.ratingCategories,
     createdAt: toMillis(d.createdAt),
     updatedAt: toMillis(d.updatedAt),
   };
@@ -145,6 +148,18 @@ export async function saveMyRating(
   recipeId: string,
   cats: Partial<Record<RatingCategory, number>>,
 ) {
-  await setDoc(doc(db, 'recipes', recipeId), { ratingCategories: cats }, { merge: true });
+  await setDoc(doc(db, 'recipe_cards', recipeId), { ratingCategories: cats }, { merge: true });
   return { cats, id: recipeId };
+}
+
+export async function saveSoloRating(recipeId: string, cat: RatingCategory, value: number) {
+  const path = `ratingCategories.${cat}`;
+
+  // Write to both collections in parallel
+  await Promise.all([
+    updateDoc(doc(db, 'recipe_cards', recipeId), { [path]: value }),
+    updateDoc(doc(db, 'recipes', recipeId), { [path]: value }),
+  ]);
+
+  return { id: recipeId, cat, value };
 }

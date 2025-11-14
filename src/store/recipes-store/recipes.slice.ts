@@ -5,14 +5,15 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 
-import { RecipeCard } from '@api/models/recipes';
+import { RecipeCard, RecipeEntity } from '@api/models/recipes';
 import {
   getRecipe,
   addRecipePair,
   listRecipeCardsByOwnerPaged,
   deleteRecipePair,
+  saveSoloRating,
 } from '@api/services';
-import { CreateRecipeInput, RootState } from '@api/types';
+import { CreateRecipeInput, RatingCategory, RootState } from '@api/types';
 
 export const cardsAdapter = createEntityAdapter<RecipeCard, string>({
   selectId: (r) => r.id,
@@ -29,36 +30,56 @@ type PageMeta = {
 type RecipesState = {
   cards: ReturnType<typeof cardsAdapter.getInitialState>;
   mine: PageMeta;
+  currentRecipe: RecipeEntity | null;
 };
 
 const initialState: RecipesState = {
   cards: cardsAdapter.getInitialState(),
   mine: { loading: false, error: null, nextStartAfter: null, pageSize: 24 },
+  currentRecipe: null,
 };
 
 export const fetchMyRecipeCardsPage = createAsyncThunk(
   'recipes/fetchMinePage',
   async ({ uid, pageSize }: { uid: string; pageSize?: number }, { getState }) => {
     const state = getState() as RootState;
-    console.log('here');
-
     const { nextStartAfter } = state.recipes.mine;
     const size = pageSize ?? state.recipes.mine.pageSize;
     const res = await listRecipeCardsByOwnerPaged(uid, size, nextStartAfter ?? undefined);
-    console.log('here res', res);
-
     return { ...res };
   },
 );
 
-export const fetchRecipeDetails = createAsyncThunk('recipes/fetchDetails', async (id: string) => {
-  const doc = await getRecipe(id);
-  return doc; // full Recipe or null
-});
+// export const fetchRecipeById = createAsyncThunk('recipes/fetchOne', async (id: string) => {
+//   return await getRecipe(id);
+// });
 
-export const fetchRecipeById = createAsyncThunk('recipes/fetchOne', async (id: string) => {
-  return await getRecipe(id);
-});
+export const fetchRecipeById = createAsyncThunk(
+  'recipes/fetchRecipeById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const res = await getRecipe(id);
+      return res;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const saveSoloRatingThunk = createAsyncThunk(
+  'recipes/saveSoloRating',
+  async (
+    { recipeId, cat, value }: { recipeId: string; cat: RatingCategory; value: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      const res = await saveSoloRating(recipeId, cat, value);
+      return res;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
 
 // export const createRecipe = createAppAsyncThunk<
 //   string,
@@ -131,41 +152,39 @@ const recipesSlice = createSlice({
 
       .addCase(removeRecipe.fulfilled, (state, action: PayloadAction<string>) => {
         cardsAdapter.removeOne(state.cards, action.payload);
+      })
+
+      .addCase(fetchRecipeById.pending, (state) => {
+        state.mine.loading = true;
+        state.mine.error = null;
+      })
+      .addCase(fetchRecipeById.fulfilled, (state, action) => {
+        state.currentRecipe = action.payload;
+        state.mine.loading = false;
+      })
+      .addCase(fetchRecipeById.rejected, (state, action) => {
+        state.mine.loading = false;
+        state.mine.error = action.error.message ?? 'Failed to save solo rating';
+      })
+
+      .addCase(saveSoloRatingThunk.pending, (state) => {
+        // state.mine.loading = true;
+        state.mine.error = null;
+      })
+      .addCase(saveSoloRatingThunk.fulfilled, (state, action) => {
+        const { id, cat, value } = action.payload;
+        const card = state.cards.entities[id];
+        if (!card) return;
+
+        const prev = card.ratingCategories ?? {};
+        card.ratingCategories = { ...prev, [cat]: value };
+        if (state.currentRecipe) state.currentRecipe.ratingCategories = { ...prev, [cat]: value };
+        state.mine.loading = false;
+      })
+      .addCase(saveSoloRatingThunk.rejected, (state, action) => {
+        state.mine.loading = false;
+        state.mine.error = action.error.message ?? 'Failed to save solo rating';
       });
-
-    // .addCase(fetchRecipeDetails.fulfilled, (state, action) => {
-    //   const recipe = action.payload as RecipeEntity | null;
-    //   if (!recipe?.id) return;
-
-    //   // merge heavy fields into the existing entity
-    //   recipesAdapter.upsertOne(state.entities, {
-    //     ...recipe,
-    //     createdAt: typeof recipe.createdAt === 'number' ? recipe.createdAt : null,
-    //     updatedAt: typeof recipe.updatedAt === 'number' ? recipe.updatedAt : null,
-    //   });
-    // });
-
-    // .addCase(createRecipe.pending, (s) => {
-    //   s.loading = true;
-    //   s.error = null;
-    // })
-    // .addCase(createRecipe.fulfilled, (s) => {
-    //   s.loading = false;
-    // })
-    // .addCase(createRecipe.rejected, (s, a) => {
-    //   s.loading = false;
-    //   s.error = a.error.message ?? 'Error creating recipe';
-    // })
-
-    // .addCase(fetchRecipeById.fulfilled, (s, a: PayloadAction<Recipe | null>) => {
-    //   s.selected = a.payload ?? null;
-    // })
-    // .addCase(saveRecipe.fulfilled, (s, a) => {
-    //   // Optionally sync with items; simplest is to refetch list in UI
-    // })
-    // .addCase(removeRecipe.fulfilled, (s, a: PayloadAction<string>) => {
-    //   s.items = s.items.filter((r) => r.id !== a.payload);
-    // });
   },
 });
 

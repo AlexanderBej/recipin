@@ -1,0 +1,15 @@
+@use '../../styles/global.scss' as *;
+
+.ratings {
+  padding: $spacing-3;
+  display: grid;
+  gap: $spacing-3;
+
+  .rating-container {
+    margin-left: 100px;
+
+    .rating-label {
+      text-transform: capitalize;
+    }
+  }
+}

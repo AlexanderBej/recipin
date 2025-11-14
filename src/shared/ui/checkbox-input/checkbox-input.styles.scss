@@ -1,101 +1,95 @@
-// @use '../../../styles/tokens.scss' as *;
+@use '../../../styles/global.scss' as *;
 
-// .checkbox-input {
-//   display: flex;
-//   align-items: center;
-//   gap: 8px;
-//   cursor: pointer;
+:root {
+  --checkbox-size: 22px;
+  --checkbox-radius: 999px; // pill/circle
+  --checkbox-border-unchecked: rgba(255, 255, 255, 0.7);
+  --checkbox-border-checked: #ff7a00; // your accent
+  --checkbox-bg-checked: rgba(255, 122, 0, 0.16);
+}
 
-//   &__switch {
-//     .checkbox-label {
-//       cursor: pointer;
-//     }
-//   }
+// Container
+.rec-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-3;
+  cursor: pointer;
+  user-select: none;
+}
 
-//   .form-checkbox {
-//     appearance: none;
-//     width: 20px;
-//     height: 20px;
-//     border: 2px solid;
-//     @include themed(border-color, color-neutral, $color-neutral);
-//     border-radius: 4px;
-//     position: relative;
-//     cursor: pointer;
-//     transition: all $transition-fast;
+// The native input (keep it accessible but hidden visually)
+.rec-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
 
-//     &:checked {
-//       @include themed(background-color, color-secondary, $color-secondary);
-//       @include themed(border-color, color-secondary, $color-secondary);
+// Visual box
+.rec-checkbox-box {
+  position: relative;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border-radius: var(--checkbox-radius);
+  border: 2px solid var(--checkbox-border-unchecked);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: transparent;
+  transition:
+    border-color 160ms ease-out,
+    background-color 160ms ease-out,
+    transform 120ms ease-out;
+}
 
-//       & ~ .checkbox-label {
-//         @include themed(color, color-text-primary, $color-text-primary);
-//       }
-//     }
+// Checkmark SVG
+.rec-checkbox-icon {
+  width: 14px;
+  height: 14px;
+  stroke: var(--checkbox-border-checked);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 
-//     /* Custom swish/checkmark */
-//     &:checked::after {
-//       content: '';
-//       position: absolute;
-//       left: 6px;
-//       top: 2px;
-//       width: 5px;
-//       height: 10px;
-//       border: solid white;
-//       border-width: 0 2px 2px 0;
-//       transform: rotate(45deg);
-//     }
+  /* “Draw” animation setup */
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 160ms ease-out;
+}
 
-//     &__switch {
-//       position: relative;
-//       appearance: none;
-//       width: 74px;
-//       height: 34px;
-//       border-radius: 999px;
-//       @include themed(background-color, color-bg-main, $color-bg-main);
-//       outline: none;
-//       transition: background-color 150ms ease;
-//       cursor: pointer;
+// Label text
+.rec-checkbox-label {
+  font-size: 14px;
+  font-weight: bold;
+  //   color: rgba(255, 255, 255, 0.9);
+}
 
-//       /* thumb */
-//       &::after {
-//         content: '';
-//         position: absolute;
-//         top: 3px;
-//         left: 6px;
-//         width: 24px;
-//         height: 24px;
-//         border-radius: 50%;
-//         @include themed(background-color, color-secondary, $color-secondary);
-//         transition: transform 150ms ease;
-//       }
+/* ===== STATES ===== */
 
-//       &:checked {
-//         @include themed(background-color, color-bg-main, $color-bg-main);
-//         @include themed(border-color, color-bg-main, $color-bg-main);
-//       }
-//       &:checked::after {
-//         transform: translateX(36px);
-//         top: 3px;
-//         width: 24px;
-//         height: 24px;
-//         @include themed(border-color, color-secondary, $color-secondary);
-//       }
-//       &:focus-visible {
-//         box-shadow: 0 0 0 3px var(--switch-ring, rgba(59, 130, 246, 0.5));
-//       }
-//     }
+/* Checked: color + swish appears */
+.rec-checkbox-input:checked + .rec-checkbox-box {
+  border-color: var(--checkbox-border-checked);
+  background-color: var(--checkbox-bg-checked);
+  transform: scale(0.96); // tiny “press” effect
+}
 
-//     &:disabled {
-//       opacity: 0.5;
-//       cursor: not-allowed;
-//     }
-//   }
+.rec-checkbox-input:checked + .rec-checkbox-box .rec-checkbox-icon {
+  stroke-dashoffset: 0; // animates the swish
+}
 
-//   .checkbox-label {
-//     user-select: none;
-//     font-size: 14px;
-//     line-height: 1.25rem;
-//     cursor: pointer;
-//     @include themed(color, color-text-secondary, $color-text-secondary);
-//   }
-// }
+/* Focus (keyboard) */
+.rec-checkbox-input:focus-visible + .rec-checkbox-box {
+  outline: 2px solid var(--checkbox-border-checked);
+  outline-offset: 2px;
+}
+
+/* Disabled (if you need it) */
+.rec-checkbox-input:disabled + .rec-checkbox-box {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.rec-checkbox-input:disabled ~ .rec-checkbox-label {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

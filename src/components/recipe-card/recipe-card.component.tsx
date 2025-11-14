@@ -1,12 +1,14 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 import { RecipeCard as RecipeCardModel } from '@api/models';
 import { CATEGORY_META } from '@api/misc';
 import { Chip, RecIcon } from '@shared/ui';
-import { RecipeDifficulty } from '@api/types';
-import { getCssVar } from '@shared/utils';
+import { AppDispatch, RecipeDifficulty } from '@api/types';
+import { getCssVar, toDateOrNull } from '@shared/utils';
+import { fetchRecipeById } from '@store/recipes-store';
 
 import './recipe-card.styles.scss';
 const placeholderImage = require('../../assets/img_placeholder.png');
@@ -16,6 +18,7 @@ interface RecipeCardProps {
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const getDifColor = (dif: RecipeDifficulty | undefined): string => {
@@ -26,8 +29,17 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         : getCssVar('--color-error');
   };
 
+  const handleRecipeTap = () => {
+    console.log('get here');
+
+    dispatch(fetchRecipeById(recipe.id));
+    navigate(`/recipe/${recipe.id}`);
+  };
+
+  const updatedAtDate = toDateOrNull(recipe.updatedAt);
+
   return (
-    <div className="recipe-card" onClick={() => navigate(`/recipe/${recipe.id}`)}>
+    <div className="recipe-card" onClick={handleRecipeTap}>
       <img
         className="recipe-image"
         src={recipe?.imageUrl ?? placeholderImage}
@@ -49,7 +61,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           <p className="truncate-p">{recipe.excerpt}</p>
           <div className="row">
             <span style={{ color: getDifColor(recipe.difficulty) }}>{recipe.difficulty}</span>
-            <span>{format(new Date(recipe.updatedAt ?? ''), 'MMM, yyyy')}</span>
+            <span>{updatedAtDate ? format(updatedAtDate, 'MMM, yyyy') : '—'}</span>
           </div>
         </div>
         <div className="tags-container">

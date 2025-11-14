@@ -3,56 +3,23 @@ import clsx from 'clsx';
 
 import './checkbox-input.styles.scss';
 
-interface CheckboxInputProps {
-  label?: string;
-  onText?: string;
-  offText?: string;
-  name: string;
-  checked: boolean;
-  // eslint-disable-next-line no-unused-vars
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  disabled?: boolean;
-  /** new: choose look */
-  variant?: 'checkbox' | 'switch';
-  /** optional extra class */
-  className?: string;
+interface RecCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: React.ReactNode;
 }
 
-const CheckboxInput: React.FC<CheckboxInputProps> = ({
-  label,
-  onText,
-  offText,
-  name,
-  checked,
-  onChange,
-  disabled = false,
-  variant = 'checkbox',
-  className,
-}) => {
-  const inputClass = clsx('form-checkbox', {
-    'form-checkbox__switch': variant === 'switch',
-  });
+const CheckboxInput: React.FC<RecCheckboxProps> = ({ label, className, ...inputProps }) => {
+  const inputClass = clsx('rec-checkbox ', className);
 
   return (
-    <div className={`checkbox-input checkbox-input__${variant} ${className}`}>
-      <label htmlFor={name} className="checkbox-label">
-        {onText}
-      </label>
-      <input
-        type="checkbox"
-        id={name}
-        name={name}
-        checked={checked}
-        onChange={onChange}
-        disabled={disabled}
-        className={inputClass}
-        role={variant === 'switch' ? 'switch' : undefined} // optional ARIA hint
-        aria-checked={checked}
-      />
-      <label htmlFor={name} className="checkbox-label">
-        {label || offText}
-      </label>
-    </div>
+    <label className={inputClass}>
+      <input type="checkbox" className="rec-checkbox-input" {...inputProps} />
+      <span className="rec-checkbox-box">
+        <svg className="rec-checkbox-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M3 8.5 L6.5 12 L13 4" />
+        </svg>
+      </span>
+      {label && <span className="rec-checkbox-label">{label}</span>}
+    </label>
   );
 };
 

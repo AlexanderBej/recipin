@@ -1,0 +1,28 @@
+@use '../../styles/global.scss' as *;
+
+.copy-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  color: $color-text-primary;
+  font-weight: bold;
+  padding: $spacing-3;
+
+  &__small {
+    padding: $spacing-1 $spacing-2;
+  }
+}
+
+.menu-copy-btn {
+  text-align: left;
+  color: $color-text-primary;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  height: 25px;
+
+  .copy-succes {
+    width: 20px;
+  }
+}
