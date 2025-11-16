@@ -10,3 +10,4 @@ export const selectMyCardsHasMore = (s: RootState) => !!s.recipes.mine.nextStart
 export const selectCardById = (s: RootState, id: string) => cardsSelectors.selectById(s, id);
 
 export const selectRecipesCurrent = (state: RootState) => state.recipes.currentRecipe;
+export const selectRecipesFavorites = (state: RootState) => state.recipes.favorites;

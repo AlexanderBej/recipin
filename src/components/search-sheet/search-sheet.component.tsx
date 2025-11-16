@@ -10,6 +10,7 @@ import { selectAuthUserId } from '@store/auth-store';
 import { RecipeCategory } from '@api/types';
 
 import './search-sheet.styles.scss';
+import { RecipeImg } from '@components';
 const placeholderImage = require('../../assets/img_placeholder.png');
 
 interface SearchSheetProps {
@@ -70,11 +71,7 @@ const SearchSheet: React.FC<SearchSheetProps> = ({ selectedMealCategory }) => {
             {recipes &&
               recipes.map((rec) => (
                 <div key={rec.id} className="recipe-row">
-                  <img
-                    className="recipe-image"
-                    src={rec.imageUrl ?? placeholderImage}
-                    alt={`${rec.title}`}
-                  />
+                  <RecipeImg src={rec.imageUrl} alt={rec.title} variant="thumb" />
                   <h3>{rec.title}</h3>
                 </div>
               ))}

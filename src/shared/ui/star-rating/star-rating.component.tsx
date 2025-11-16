@@ -10,9 +10,15 @@ export interface StarRatingProps {
   value: number; // current selected rating
   onChange?: (next: number) => void;
   showValue?: boolean;
+  small?: boolean;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ value, onChange, showValue = false }) => {
+const StarRating: React.FC<StarRatingProps> = ({
+  value,
+  onChange,
+  showValue = false,
+  small = false,
+}) => {
   const [hover, setHover] = useState<number | null>(null);
 
   return (
@@ -42,7 +48,7 @@ const StarRating: React.FC<StarRatingProps> = ({ value, onChange, showValue = fa
                 padding: 0,
               }}
             >
-              <RecIcon icon={icon} size={24} color={getCssVar('--color-primary')} />
+              <RecIcon icon={icon} size={small ? 18 : 24} color={getCssVar('--color-primary')} />
             </button>
           );
         })}

@@ -5,14 +5,13 @@ import { useNavigate } from 'react-router';
 
 import { RecipeCard as RecipeCardModel } from '@api/models';
 import { CATEGORY_META } from '@api/misc';
-import { Chip, RecIcon } from '@shared/ui';
+import { Chip, Favorite, RecIcon } from '@shared/ui';
 import { AppDispatch, RecipeDifficulty } from '@api/types';
 import { getCssVar, toDateOrNull } from '@shared/utils';
 import { fetchRecipeById } from '@store/recipes-store';
+import { RecipeImg } from '@components';
 
 import './recipe-card.styles.scss';
-const placeholderImage = require('../../assets/img_placeholder.png');
-
 interface RecipeCardProps {
   recipe: RecipeCardModel;
 }
@@ -40,13 +39,17 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   return (
     <div className="recipe-card" onClick={handleRecipeTap}>
-      <img
-        className="recipe-image"
-        src={recipe?.imageUrl ?? placeholderImage}
-        alt={`${recipe?.title}`}
+      <Favorite
+        isFavorite={recipe?.isFavorite ?? false}
+        recipeId={recipe?.id ?? ''}
+        className="recipe-card-fav"
       />
+
+      <RecipeImg src={recipe.imageUrl} alt={recipe.title} variant="square" />
       <div className="recipe-details">
         <div className="details-container">
+          <h4 className="recipe-title">{recipe.title}</h4>
+
           <div
             className="category-box"
             style={{
@@ -57,7 +60,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <RecIcon icon={CATEGORY_META[recipe.category].icon} size={11} />
             <span>{CATEGORY_META[recipe.category].label}</span>
           </div>
-          <h4 className="recipe-title">{recipe.title}</h4>
           <p className="truncate-p">{recipe.excerpt}</p>
           <div className="row">
             <span style={{ color: getDifColor(recipe.difficulty) }}>{recipe.difficulty}</span>
@@ -66,7 +68,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         </div>
         <div className="tags-container">
           {recipe.tags.map((tag) => (
-            <Chip key={tag} tag={tag} onToggle={() => {}} active={true} className="card-tag" />
+            <Chip key={tag} tag={tag} onToggle={() => {}} active className="card-tag" />
           ))}
         </div>
       </div>

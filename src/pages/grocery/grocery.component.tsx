@@ -88,7 +88,7 @@ const Grocery: React.FC = () => {
                 <h3 className="grocery-rec-title">{gRec.title}</h3>
                 <RecIcon icon={FaExternalLinkAlt} size={18} color={getCssVar('--color-primary')} />
               </button>
-              <CopyDropdown ingredients={gRec.items} small={true} />
+              <CopyDropdown ingredients={gRec.items} small />
             </div>
             <div className="grocery-items">
               {gRec.items.map((gItem) => {
@@ -111,6 +111,9 @@ const Grocery: React.FC = () => {
           </div>
         );
       })}
+      <Button variant="danger" type="button" disabled={!groceryRecipes}>
+        Clear grocery list
+      </Button>
     </div>
   );
 };

@@ -10,11 +10,11 @@ import { IoFlash } from 'react-icons/io5';
 import { MdOutlineLocalGroceryStore } from 'react-icons/md';
 import { MdLocalGroceryStore } from 'react-icons/md';
 
-import { selectRecipesCurrent } from '@store/recipes-store';
-import { Chip, RecIcon } from '@shared/ui';
+import { removeRecipe, selectRecipesCurrent } from '@store/recipes-store';
+import { Chip, Favorite, RecIcon } from '@shared/ui';
 import { buildIngredient, formatHoursAndMinutes, getCssVar, toDateOrNull } from '@shared/utils';
 import { CATEGORY_META } from '@api/misc';
-import { PlannerModal, RatingsSheet } from '@components';
+import { ConfirmaModal, PlannerModal, RatingsSheet, RecipeImg } from '@components';
 import { GroceryItem } from '@api/models';
 import { AppDispatch } from '@api/types';
 import { addGroceryRecipe, makeSelectHasGroceryRecipe } from '@store/grocery-store';
@@ -61,17 +61,25 @@ const RecipeDetails: React.FC = () => {
     }
   };
 
+  const handleRecipeRemove = async () => {
+    if (recipe?.id) {
+      await dispatch(removeRecipe(recipe.id));
+      navigate('/library');
+    }
+  };
+
   const updatedAtDate = toDateOrNull(recipe?.updatedAt);
 
   return (
     <div className="recipe-details">
       <div className="recipe-image-wrapper">
         <div className="recipe-image-overlay" />
-        <img
-          className="recipe-image"
-          src={recipe?.imageUrl ?? placeholderImage}
-          alt={`${recipe?.title}`}
+        <Favorite
+          small={false}
+          isFavorite={recipe?.isFavorite ?? false}
+          recipeId={recipe?.id ?? ''}
         />
+        <RecipeImg src={recipe?.imageUrl} alt={recipe?.title} variant="detail" />
 
         <h2 className="recipe-title">{recipe?.title}</h2>
       </div>
@@ -106,7 +114,7 @@ const RecipeDetails: React.FC = () => {
 
       <div className="tags-row">
         {recipe?.tags.map((tag) => (
-          <Chip key={tag} tag={tag} active={true} onToggle={() => {}} />
+          <Chip key={tag} tag={tag} active onToggle={() => {}} />
         ))}
         <div
           className="category-box"
@@ -168,6 +176,13 @@ const RecipeDetails: React.FC = () => {
         <h3 className="container-heading">Rating</h3>
         <RatingsSheet recipeId={recipe?.id ?? ''} ratingCategories={recipe?.ratingCategories} />
       </div>
+
+      <hr className="divider" />
+      <ConfirmaModal
+        buttonLabel="Delete Recipe"
+        message="Are you sure you want to delete this recipe? This process is irreversible!"
+        handleConfirm={handleRecipeRemove}
+      />
     </div>
   );
 };

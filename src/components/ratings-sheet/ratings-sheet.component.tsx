@@ -36,7 +36,7 @@ const RatingsSheet: React.FC<RatingsSheetProps> = ({ recipeId, ratingCategories 
       <div className="open-ratings-row">
         <StarRating
           value={total}
-          showValue={true}
+          showValue
           onChange={() => {
             setOpen(true);
           }}

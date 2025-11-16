@@ -100,6 +100,7 @@ export async function listRecipeCardsByOwnerPaged(
         difficulty: x.difficulty ?? null,
         imageUrl: x.imageUrl ?? null,
         excerpt: x.excerpt ?? null,
+        isFavorite: x.isFavorite,
         ratingCategories: x.ratingCategories ?? null,
         createdAt: toMillis(x.createdAt),
         updatedAt: toMillis(x.updatedAt),
@@ -128,53 +129,38 @@ export async function listRecipeCardsByOwnerPaged(
   }
 }
 
-// export async function listRecipeCardsByOwnerPaged(
-//   uid: string,
-//   pageSize = 24,
-//   startAfterCreatedAt?: number | null,
-//   filters: { category?: string; tag?: string } = {},
-// ) {
-//   const clauses = [where('authorId', '==', uid)];
+export async function listFavoriteRecipes(uid: string) {
+  const clauses = [where('authorId', '==', uid), where('isFavorite', '==', true)];
+  const base = query(cardsCol, ...clauses, orderBy('createdAt', 'desc'), limit(100));
 
-//   if (filters.category) clauses.push(where('category', '==', filters.category));
-//   if (filters.tag) clauses.push(where('tags', 'array-contains', filters.tag));
-//   const base = query(cardsCol, ...clauses, orderBy('createdAt', 'desc'), limit(pageSize));
+  try {
+    const snap = await getDocs(base);
 
-//   const q =
-//     startAfterCreatedAt != null
-//       ? query(base, startAfter(Timestamp.fromMillis(startAfterCreatedAt)))
-//       : base;
+    const items: RecipeCard[] = snap.docs.map((d) => {
+      const x = d.data() as any;
+      return {
+        id: d.id,
+        authorId: x.authorId,
+        title: x.title,
+        titleSearch: makeTitleSearch(x.title),
+        category: x.category,
+        tags: x.tags ?? [],
+        difficulty: x.difficulty ?? null,
+        imageUrl: x.imageUrl ?? null,
+        excerpt: x.excerpt ?? null,
+        isFavorite: x.isFavorite,
+        ratingCategories: x.ratingCategories ?? null,
+        createdAt: toMillis(x.createdAt),
+        updatedAt: toMillis(x.updatedAt),
+      };
+    });
 
-//   try {
-//     const snap = await getDocs(q);
-
-//     const items: RecipeCard[] = snap.docs.map((d) => {
-//       const x = d.data() as any;
-//       return {
-//         id: d.id,
-//         authorId: x.authorId,
-//         title: x.title,
-//         titleSearch: makeTitleSearch(x.title),
-//         category: x.category,
-//         tags: x.tags ?? [],
-//         difficulty: x.difficulty ?? null,
-//         imageUrl: x.imageUrl ?? null,
-//         excerpt: x.excerpt ?? null,
-//         ratingCategories: x.ratingCategories ?? null,
-//         createdAt: toMillis(x.createdAt),
-//         updatedAt: toMillis(x.updatedAt),
-//       };
-//     });
-
-//     const last = snap.docs.at(-1);
-//     const nextStartAfter = last ? toMillis((last.data() as any).createdAt) : null;
-
-//     return { items, nextStartAfter };
-//   } catch (e) {
-//     console.error('[cards paged] query failed:', e);
-//     throw e;
-//   }
-// }
+    return { items };
+  } catch (e) {
+    console.error('[cards paged] favorite query failed:', e);
+    throw e;
+  }
+}
 
 export async function getRecipe(id: string): Promise<RecipeEntity | null> {
   const ref = doc(recipesCol, id);
@@ -194,6 +180,7 @@ export async function getRecipe(id: string): Promise<RecipeEntity | null> {
     description: d.description ?? '',
     ingredients: d.ingredients ?? [],
     steps: d.steps ?? [],
+    isFavorite: d.isFavorite,
     servings: d.servings,
     prepMinutes: d.prepMinutes,
     cookMinutes: d.cookMinutes,
@@ -236,6 +223,7 @@ export async function addRecipePair(data: CreateRecipeInput) {
     titleSearch: makeTitleSearch(cardDoc.title),
     category: cardDoc.category,
     tags: cardDoc.tags,
+    isFavorite: false,
     ...cardDoc,
     createdAt: null, // server sets it; you can refetch page or leave null until next load
     updatedAt: null,
@@ -266,4 +254,14 @@ export async function saveSoloRating(recipeId: string, cat: RatingCategory, valu
   ]);
 
   return { id: recipeId, cat, value };
+}
+
+export async function toggleRecipeFavorite(recipeId: string, fav: boolean) {
+  // Write to both collections in parallel
+  await Promise.all([
+    updateDoc(doc(db, 'recipe_cards', recipeId), { isFavorite: fav }),
+    updateDoc(doc(db, 'recipes', recipeId), { isFavorite: fav }),
+  ]);
+
+  return { id: recipeId, fav };
 }

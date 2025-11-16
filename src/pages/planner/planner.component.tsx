@@ -15,9 +15,9 @@ import { PeriodSwitcher, WeekTable } from '@features/planner';
 import { RecIcon } from '@shared/ui';
 import { SearchSheet } from '@components';
 import { selectAuthUserId } from '@store/auth-store';
+import { MEAL_SLOTS } from '@api/misc';
 
 import './planner.styles.scss';
-import { MEAL_SLOTS } from '@api/misc';
 
 const Planner: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -107,15 +107,6 @@ const Planner: React.FC = () => {
           <h3>{formatSelectedDay(selectedDateISO)}</h3>
         </div>
         <div className="planner-day-content">
-          {/* <div className="meal-box">
-            <h4 className="meal-type">Breakfast</h4>
-            {getItemForSlot('breakfast') ? (
-              <div></div>
-            ) : (
-              <SearchSheet selectedMealCategory="breakfast" />
-            )}
-          </div> */}
-
           {MEAL_SLOTS.map((meal, index) => {
             const isSnack = meal === 'snacks';
             const planItem = getItemForSlot(meal);
@@ -142,24 +133,6 @@ const Planner: React.FC = () => {
               </div>
             );
           })}
-
-          {/* <div className="meal-box">
-            <h4 className="meal-type">Lunch</h4>
-            <SearchSheet selectedMealCategory="lunch" />
-          </div>
-          <div className="snack-box">
-            <div className="snack-divider" />
-            <button aria-label="Add recipe to snack slot">
-              <RecIcon icon={GoPlusCircle} size={32} color={getCssVar('--color-text-primary')} />
-            </button>
-          </div>
-          <div className="meal-box">
-            <h4 className="meal-type">Dinner</h4>
-            <SearchSheet selectedMealCategory="dinner" />
-          </div> */}
-          {/* {itemsForSelectedDate.map((item) => {
-            return <div key={item.id}></div>
-          })} */}
         </div>
       </div>
 

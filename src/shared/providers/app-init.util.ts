@@ -3,7 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@lib/firebase';
 import { AppDispatch } from '@store/store';
 import { setAuthLoading, userSignedIn, userSignedOut } from '@store/auth-store';
-import { fetchMyRecipeCardsPage, resetMine } from '@store/recipes-store';
+import { fetchMyFavorites, fetchMyRecipeCardsPage, resetMine } from '@store/recipes-store';
 
 export const initApp = (dispatch: AppDispatch) => {
   dispatch(setAuthLoading());
@@ -15,6 +15,7 @@ export const initApp = (dispatch: AppDispatch) => {
     console.log(fbUser?.uid);
 
     dispatch(fetchMyRecipeCardsPage({ uid: fbUser?.uid ?? '' }));
+    dispatch(fetchMyFavorites(fbUser?.uid ?? ''));
 
     if (!fbUser) {
       dispatch(userSignedOut());

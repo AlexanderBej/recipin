@@ -1,0 +1,8 @@
+@use '../../../styles/global.scss' as *;
+
+.favorite-icon {
+  position: absolute;
+  top: $spacing-2;
+  right: $spacing-2;
+  z-index: 10;
+}

@@ -4,6 +4,7 @@ export * from './chip';
 export * from './checkbox-input';
 export * from './dropdown';
 export * from './expansion-row';
+export * from './favorite';
 export * from './input';
 export * from './icon';
 export * from './info-popover';

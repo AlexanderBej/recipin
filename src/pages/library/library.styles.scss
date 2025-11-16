@@ -21,21 +21,15 @@
       padding-bottom: $spacing-2; // space for scrollbar (optional)
       scroll-snap-type: x mandatory;
     }
+  }
 
-    .recipes-list > * {
-      flex: 0 0 135px; // no grow, no shrink, 135px basis
-      min-width: 135px; // belt-and-suspenders
-      max-width: 135px;
-      scroll-snap-align: start; // optional
-    }
+  .libary-heading {
+    margin-bottom: $spacing-3;
   }
 
   .all-recipes-list {
     margin-top: $spacing-8;
 
-    h3 {
-      margin-bottom: $spacing-3;
-    }
     .recipes-list {
       display: grid;
       width: 100%;

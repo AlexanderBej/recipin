@@ -3,14 +3,13 @@ import { useSelector } from 'react-redux';
 
 import { Input } from '@shared/ui';
 import { FavoriteCard, RecipeCard, TagSheet } from '@components';
-import { selectAllRecipes } from '@store/recipes-store';
-import { selectAuthUserId } from '@store/auth-store';
+import { selectAllRecipes, selectRecipesFavorites } from '@store/recipes-store';
 
 import './library.styles.scss';
 
 const Library: React.FC = () => {
   const recipes = useSelector(selectAllRecipes);
-  const uid = useSelector(selectAuthUserId);
+  const favorites = useSelector(selectRecipesFavorites);
 
   const [search, setSearch] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -33,16 +32,16 @@ const Library: React.FC = () => {
       </div>
 
       <div className="favorites-list">
-        <h3>Favorites</h3>
+        <h3 className="libary-heading">Favorites</h3>
         <div className="recipes-list">
-          {recipes.map((recipe) => (
-            <FavoriteCard key={recipe.id} recipe={recipe} />
+          {favorites.map((favRec) => (
+            <FavoriteCard key={favRec.id} recipe={favRec} />
           ))}
         </div>
       </div>
 
       <div className="all-recipes-list">
-        <h3>All recipes</h3>
+        <h3 className="libary-heading">All recipes</h3>
         <div className="recipes-list">
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />

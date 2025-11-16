@@ -11,6 +11,7 @@ export interface RecipeCard {
   tags: string[];
   difficulty?: RecipeDifficulty;
   ratingCategories?: Partial<Record<RatingCategory, number>>;
+  isFavorite?: boolean;
   createdAt?: number | null;
   updatedAt?: number | null;
 }

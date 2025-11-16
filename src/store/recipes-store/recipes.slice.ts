@@ -12,8 +12,10 @@ import {
   listRecipeCardsByOwnerPaged,
   deleteRecipePair,
   saveSoloRating,
+  toggleRecipeFavorite,
+  listFavoriteRecipes,
 } from '@api/services';
-import { CreateRecipeInput, RatingCategory, RootState } from '@api/types';
+import { createAppAsyncThunk, CreateRecipeInput, RatingCategory, RootState } from '@api/types';
 import { ListRecipeCardsOptions, ListRecipeCardsResult } from '@api/models';
 
 export const cardsAdapter = createEntityAdapter<RecipeCard, string>({
@@ -30,6 +32,7 @@ type PageMeta = {
 
 type RecipesState = {
   cards: ReturnType<typeof cardsAdapter.getInitialState>;
+  favorites: RecipeCard[];
   mine: PageMeta;
   currentRecipe: RecipeEntity | null;
 };
@@ -37,6 +40,7 @@ type RecipesState = {
 const initialState: RecipesState = {
   cards: cardsAdapter.getInitialState(),
   mine: { loading: false, error: null, nextStartAfter: null, pageSize: 24 },
+  favorites: [],
   currentRecipe: null,
 };
 
@@ -56,9 +60,17 @@ export const fetchMyRecipeCardsPage = createAsyncThunk(
   },
 );
 
-// export const fetchRecipeById = createAsyncThunk('recipes/fetchOne', async (id: string) => {
-//   return await getRecipe(id);
-// });
+export const fetchMyFavorites = createAppAsyncThunk<RecipeCard[], string>(
+  'recipes/fetchMyFavs',
+  async (id, { rejectWithValue }) => {
+    try {
+      const { items } = await listFavoriteRecipes(id);
+      return items;
+    } catch (error: any) {
+      return rejectWithValue(error.message ?? 'Failed to fetch my favorite recipes');
+    }
+  },
+);
 
 export const fetchRecipeById = createAsyncThunk(
   'recipes/fetchRecipeById',
@@ -87,39 +99,41 @@ export const saveSoloRatingThunk = createAsyncThunk(
   },
 );
 
-// export const createRecipe = createAppAsyncThunk<
-//   string,
-//   { data: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'> }
-// >('recipes/create', async ({ data }, { rejectWithValue }) => {
-//   try {
-//     const id = await addRecipePair(data);
-//     return id;
-//   } catch (error: any) {
-//     return rejectWithValue(error.message ?? 'Failed to create new recipes');
-//   }
-// });
-
-export const createRecipe = createAsyncThunk('recipes/create', async (data: CreateRecipeInput) =>
-  addRecipePair(data),
-);
-
-// export const saveRecipe = createAsyncThunk(
-//   'recipes/save',
-//   async ({ id, data }: { id: string; data: Partial<Recipe> }) => {
-//     await updateRecipe(id, data);
-//     return { id, data };
-//   },
-// );
-
-export const removeRecipe = createAsyncThunk('recipes/remove', async (id: string) => {
-  await deleteRecipePair(id);
-  return id;
+export const toggleFavorite = createAppAsyncThunk<
+  { id: string; fav: boolean },
+  { recipeId: string; favorite: boolean }
+>('recipes/toggleFavorite', async ({ recipeId, favorite }, { rejectWithValue }) => {
+  try {
+    const res = await toggleRecipeFavorite(recipeId, favorite);
+    return res;
+  } catch (error: any) {
+    return rejectWithValue(error.message ?? 'Failed to toggle recipe favorite');
+  }
 });
 
-// export const removeRecipe = createAsyncThunk('recipes/remove', async (id: string) => {
-//   await deleteRecipe(id);
-//   return id;
-// });
+export const createRecipe = createAppAsyncThunk<RecipeCard, CreateRecipeInput>(
+  'recipes/create',
+  async (data, { rejectWithValue }) => {
+    try {
+      const { card } = await addRecipePair(data);
+      return card;
+    } catch (error: any) {
+      return rejectWithValue(error.message ?? 'Failed to create new recipe');
+    }
+  },
+);
+
+export const removeRecipe = createAppAsyncThunk<string, string>(
+  'recipes/remove',
+  async (id, { rejectWithValue }) => {
+    try {
+      await deleteRecipePair(id);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.message ?? 'Failed to remove recipe');
+    }
+  },
+);
 
 const recipesSlice = createSlice({
   name: 'recipes',
@@ -154,13 +168,45 @@ const recipesSlice = createSlice({
         state.mine.error = action.error.message ?? 'Failed to load recipes';
       })
 
-      .addCase(createRecipe.fulfilled, (state, action) => {
-        // optimistic: insert the returned card (timestamps null until refetch)
-        cardsAdapter.upsertOne(state.cards, action.payload.card);
+      .addCase(fetchMyFavorites.pending, (state) => {
+        state.mine.loading = true;
+        state.mine.error = null;
+      })
+      .addCase(fetchMyFavorites.fulfilled, (state, action) => {
+        state.favorites = action.payload;
+        state.mine.loading = false;
+      })
+      .addCase(fetchMyFavorites.rejected, (state, action) => {
+        state.mine.loading = false;
+        state.mine.error = action.error.message ?? 'Failed to fetch my favorites';
       })
 
-      .addCase(removeRecipe.fulfilled, (state, action: PayloadAction<string>) => {
+      .addCase(createRecipe.pending, (state) => {
+        state.mine.loading = true;
+        state.mine.error = null;
+      })
+      .addCase(createRecipe.fulfilled, (state, action) => {
+        // optimistic: insert the returned card (timestamps null until refetch)
+        cardsAdapter.upsertOne(state.cards, action.payload);
+        state.mine.loading = false;
+      })
+      .addCase(createRecipe.rejected, (state, action) => {
+        state.mine.loading = false;
+        state.mine.error = action.error.message ?? 'Failed to create new recipe';
+      })
+
+      .addCase(removeRecipe.pending, (state) => {
+        state.mine.loading = true;
+        state.mine.error = null;
+      })
+      .addCase(removeRecipe.fulfilled, (state, action) => {
+        // optimistic: insert the returned card (timestamps null until refetch)
         cardsAdapter.removeOne(state.cards, action.payload);
+        state.mine.loading = false;
+      })
+      .addCase(removeRecipe.rejected, (state, action) => {
+        state.mine.loading = false;
+        state.mine.error = action.error.message ?? 'Failed to delete recipe';
       })
 
       .addCase(fetchRecipeById.pending, (state) => {
@@ -173,7 +219,7 @@ const recipesSlice = createSlice({
       })
       .addCase(fetchRecipeById.rejected, (state, action) => {
         state.mine.loading = false;
-        state.mine.error = action.error.message ?? 'Failed to save solo rating';
+        state.mine.error = action.error.message ?? 'Failed to retrieve recipe details';
       })
 
       .addCase(saveSoloRatingThunk.pending, (state) => {
@@ -193,6 +239,31 @@ const recipesSlice = createSlice({
       .addCase(saveSoloRatingThunk.rejected, (state, action) => {
         state.mine.loading = false;
         state.mine.error = action.error.message ?? 'Failed to save solo rating';
+      })
+
+      .addCase(toggleFavorite.pending, (state) => {
+        // no loading toggle as it's not shown on fav toggle
+        state.mine.error = null;
+      })
+      .addCase(toggleFavorite.fulfilled, (state, action) => {
+        const { id, fav } = action.payload;
+        const card = state.cards.entities[id];
+        if (!card) return;
+
+        card.isFavorite = fav;
+        if (state.currentRecipe) state.currentRecipe.isFavorite = fav;
+
+        if (fav) {
+          state.favorites.push(card);
+        } else {
+          const favorite = state.favorites.find((favor) => favor.id === id);
+          if (favorite) {
+            state.favorites = state.favorites.filter((fav) => fav.id !== id);
+          }
+        }
+      })
+      .addCase(toggleFavorite.rejected, (state, action) => {
+        state.mine.error = action.error.message ?? 'Failed to toggle favorite';
       });
   },
 });
