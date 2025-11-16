@@ -78,5 +78,13 @@ export const NAV_ITEMS: NavItem[] = [
     path: '/create/:id',
     shortLabel: 'Edit',
     title: 'edit recipe',
+    showBack: true,
+  },
+  {
+    key: 'import',
+    path: '/import',
+    shortLabel: 'Import',
+    title: 'Bulk import',
+    showBack: true,
   },
 ];

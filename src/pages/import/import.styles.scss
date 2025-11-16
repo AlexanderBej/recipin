@@ -1,0 +1,49 @@
+@use '../../styles/global.scss' as *;
+
+.grocery-heading {
+  margin: $spacing-4 auto $spacing-7;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-2;
+
+  .page-copy-btn {
+    position: relative;
+
+    .copy-success {
+      position: absolute;
+
+      &__all {
+        left: 40px;
+      }
+
+      &__remaining {
+        left: 25px;
+      }
+    }
+  }
+}
+
+.grocery-recipe {
+  margin-bottom: $spacing-6;
+
+  .rec-heading {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: $spacing-4;
+
+    .title-with-icon {
+      display: inline-flex;
+      gap: $spacing-2;
+
+      .grocery-rec-title {
+        color: $color-primary;
+      }
+    }
+  }
+
+  .grocery-item {
+    margin-bottom: $spacing-3;
+  }
+}

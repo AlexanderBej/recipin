@@ -3,7 +3,17 @@ import { Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import ProtectedRoute from './routes/protected-routes';
-import { Create, Grocery, Layout, Library, Login, Planner, RecipeDetails } from '@pages';
+import {
+  Create,
+  Grocery,
+  Import,
+  Layout,
+  Library,
+  Login,
+  Planner,
+  Profile,
+  RecipeDetails,
+} from '@pages';
 import { initApp } from '@shared/providers';
 import { AppDispatch } from '@store/store';
 import './App.scss';
@@ -31,6 +41,8 @@ function App() {
         <Route path="/recipe/:id" element={<RecipeDetails />} />
         <Route path="/grocery" element={<Grocery />} />
         <Route path="/planner" element={<Planner />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/import" element={<Import />} />
       </Route>
     </Routes>
   );
