@@ -20,7 +20,6 @@ import { AppDispatch } from '@api/types';
 import { addGroceryRecipe, makeSelectHasGroceryRecipe } from '@store/grocery-store';
 
 import './recipe-details.styles.scss';
-const placeholderImage = require('../../assets/img_placeholder.png');
 
 const RecipeDetails: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

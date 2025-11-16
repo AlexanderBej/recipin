@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 
-import { selectAuthUser, selectAuthUserId } from '@store/auth-store';
+import { selectAuthUser } from '@store/auth-store';
 
 import './profile.styles.scss';
 import { NavLink } from 'react-router';

@@ -1,9 +1,4 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSlice,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 
 import { RecipeCard, RecipeEntity } from '@api/models/recipe.interface';
 import {

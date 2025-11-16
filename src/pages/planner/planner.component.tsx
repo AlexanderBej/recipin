@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { parseISO, isToday, isYesterday, isTomorrow, format } from 'date-fns';
-import { GoPlusCircle } from 'react-icons/go';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router';
 
@@ -12,10 +11,9 @@ import {
   selectPlannerWeekStart,
   setAnchorWeekStart,
 } from '@store/planner-store';
-import { getCssVar, getWeekDays, getWeekStart } from '@shared/utils';
+import { getWeekDays, getWeekStart } from '@shared/utils';
 import { AppDispatch, MealSlot, RootState } from '@api/types';
 import { PeriodSwitcher, WeekTable } from '@features/planner';
-import { RecIcon } from '@shared/ui';
 import { RecipeImg, SearchSheet } from '@components';
 import { selectAuthUserId } from '@store/auth-store';
 import { MEAL_SLOTS } from '@api/misc';
@@ -23,7 +21,6 @@ import { PlanItem, RecipeCard } from '@api/models';
 import { fetchRecipeById } from '@store/recipes-store';
 
 import './planner.styles.scss';
-import { s } from 'react-router/dist/development/index-react-server-client-BSxMvS7Z';
 
 const Planner: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
