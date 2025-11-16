@@ -41,15 +41,18 @@ const TopTitleBar: React.FC = () => {
 
   return (
     <header className="top-title-bar">
-      {showBack && (
-        <button onClick={() => navigate(-1)}>
-          <RecIcon icon={FaChevronLeft} size={24} color={getCssVar('--color-text-primary')} />
-        </button>
-      )}
-      <h1>{title}</h1>
-      {actions && actions.length > 0 && (
-        <div className="action-bar">
-          {actions.map((action) => {
+      <div>
+        {showBack && (
+          <button onClick={() => navigate(-1)}>
+            <RecIcon icon={FaChevronLeft} size={24} color={getCssVar('--color-text-primary')} />
+          </button>
+        )}
+      </div>
+      <h1 className="title">{title}</h1>
+      <div className="action-bar">
+        {actions &&
+          actions.length > 0 &&
+          actions.map((action) => {
             const meta = getActionMeta(action);
             return (
               <button
@@ -61,8 +64,7 @@ const TopTitleBar: React.FC = () => {
               </button>
             );
           })}
-        </div>
-      )}
+      </div>
     </header>
   );
 };

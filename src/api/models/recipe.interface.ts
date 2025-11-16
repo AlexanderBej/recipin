@@ -4,6 +4,7 @@ export interface RecipeCard {
   id: string;
   authorId: string;
   title: string;
+  titleSearch?: string;
   category: RecipeCategory;
   imageUrl?: string;
   excerpt?: string | null;

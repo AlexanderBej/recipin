@@ -5,7 +5,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 
-import { RecipeCard, RecipeEntity } from '@api/models/recipes';
+import { RecipeCard, RecipeEntity } from '@api/models/recipe.interface';
 import {
   getRecipe,
   addRecipePair,
@@ -14,6 +14,7 @@ import {
   saveSoloRating,
 } from '@api/services';
 import { CreateRecipeInput, RatingCategory, RootState } from '@api/types';
+import { ListRecipeCardsOptions, ListRecipeCardsResult } from '@api/models';
 
 export const cardsAdapter = createEntityAdapter<RecipeCard, string>({
   selectId: (r) => r.id,
@@ -45,8 +46,13 @@ export const fetchMyRecipeCardsPage = createAsyncThunk(
     const state = getState() as RootState;
     const { nextStartAfter } = state.recipes.mine;
     const size = pageSize ?? state.recipes.mine.pageSize;
-    const res = await listRecipeCardsByOwnerPaged(uid, size, nextStartAfter ?? undefined);
-    return { ...res };
+
+    const payload: ListRecipeCardsOptions = {
+      pageSize: size,
+      startAfterCreatedAt: nextStartAfter,
+    };
+    const res = await listRecipeCardsByOwnerPaged(uid, payload);
+    return res;
   },
 );
 
@@ -135,11 +141,14 @@ const recipesSlice = createSlice({
         state.mine.loading = true;
         state.mine.error = null;
       })
-      .addCase(fetchMyRecipeCardsPage.fulfilled, (state, action) => {
-        cardsAdapter.upsertMany(state.cards, action.payload.items);
-        state.mine.nextStartAfter = action.payload.nextStartAfter ?? null;
-        state.mine.loading = false;
-      })
+      .addCase(
+        fetchMyRecipeCardsPage.fulfilled,
+        (state, action: PayloadAction<ListRecipeCardsResult>) => {
+          cardsAdapter.upsertMany(state.cards, action.payload.items);
+          state.mine.nextStartAfter = action.payload.nextStartAfterCreatedAt ?? null;
+          state.mine.loading = false;
+        },
+      )
       .addCase(fetchMyRecipeCardsPage.rejected, (state, action) => {
         state.mine.loading = false;
         state.mine.error = action.error.message ?? 'Failed to load recipes';

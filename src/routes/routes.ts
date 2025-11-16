@@ -48,6 +48,7 @@ export const NAV_ITEMS: NavItem[] = [
     path: '/planner',
     shortLabel: 'Planner',
     title: 'Planner',
+    showBack: true,
     icon: FaClipboardList,
   },
   {

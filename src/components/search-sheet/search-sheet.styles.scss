@@ -1,0 +1,27 @@
+@use '../../styles/global.scss' as *;
+
+.search-input {
+  border: 1px solid $color-bg-card;
+  border-radius: $radius-lg;
+}
+
+.search-results {
+  width: 100%;
+  display: grid;
+  gap: $spacing-2;
+  margin-top: $spacing-3;
+
+  .recipe-row {
+    height: 70px;
+    background-color: $color-bg-card;
+    border-radius: $radius-lg;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-5;
+
+    .recipe-image {
+      height: 100%;
+      border-radius: $radius-lg;
+    }
+  }
+}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Input } from '@shared/ui';
-import { FavoriteCard, RecipeCard, TagChips } from '@components';
+import { FavoriteCard, RecipeCard, TagSheet } from '@components';
 import { selectAllRecipes } from '@store/recipes-store';
 import { selectAuthUserId } from '@store/auth-store';
 
@@ -29,7 +29,7 @@ const Library: React.FC = () => {
       />
 
       <div className="tags-container">
-        <TagChips selected={selectedTags} onChange={(tags) => setSelectedTags(tags)} />
+        <TagSheet selected={selectedTags} onChange={(tags) => setSelectedTags(tags)} />
       </div>
 
       <div className="favorites-list">

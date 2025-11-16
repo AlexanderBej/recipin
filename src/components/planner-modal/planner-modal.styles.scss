@@ -1,0 +1,86 @@
+@use '../../styles/global.scss' as *;
+
+.select-week {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  .period-btn {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid $color-neutral;
+    background: transparent;
+    color: $color-text-secondary;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    &.active {
+      background: $color-bg-card-light;
+      border-color: $color-primary;
+      color: $color-primary;
+    }
+  }
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: $spacing-6;
+}
+
+.day-pill {
+  border-radius: 999px;
+  padding: $spacing-2;
+  aspect-ratio: 1;
+  background: $color-neutral;
+  color: $color-text-secondary;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+
+  &__selected {
+    background: $color-primary;
+    color: $color-text-primary;
+  }
+
+  .day-pill-name {
+    font-weight: 500;
+  }
+
+  .day-pill-number {
+    font-size: 0.85rem;
+  }
+}
+
+.meal-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-2;
+  margin-top: $spacing-6;
+
+  .meal-box {
+    border: 1px solid $color-neutral;
+    border-radius: 999px;
+    height: 45px;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+
+    &__selected {
+      border-color: $color-primary;
+      background-color: $color-bg-card-light;
+      color: $color-primary;
+    }
+  }
+}
+
+.save-btn {
+  margin: $spacing-6 auto 0;
+  display: block;
+}

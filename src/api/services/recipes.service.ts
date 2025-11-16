@@ -15,11 +15,19 @@ import {
   Timestamp,
   setDoc,
   updateDoc,
+  startAt,
+  endAt,
 } from 'firebase/firestore';
 
 import { db } from '@lib/firebase';
-import { RecipeCard, RecipeEntity } from '@api/models';
+import {
+  ListRecipeCardsOptions,
+  ListRecipeCardsResult,
+  RecipeCard,
+  RecipeEntity,
+} from '@api/models';
 import { CreateRecipeInput, RatingCategory } from '@api/types';
+import { makeTitleSearch } from '@shared/utils';
 
 const recipesCol = collection(db, 'recipes');
 const cardsCol = collection(db, 'recipe_cards');
@@ -29,20 +37,54 @@ const toMillis = (v: any): number | null =>
 
 export async function listRecipeCardsByOwnerPaged(
   uid: string,
-  pageSize = 24,
-  startAfterCreatedAt?: number | null,
-  filters: { category?: string; tag?: string } = {},
-) {
+  {
+    pageSize = 24,
+    startAfterCreatedAt = null,
+    startAfterTitle = null,
+    filters = {},
+  }: ListRecipeCardsOptions = {},
+): Promise<ListRecipeCardsResult> {
+  const { category, tag, searchTerm } = filters;
+  const hasSearch = !!searchTerm && searchTerm.trim().length > 0;
+
   const clauses = [where('authorId', '==', uid)];
 
-  if (filters.category) clauses.push(where('category', '==', filters.category));
-  if (filters.tag) clauses.push(where('tags', 'array-contains', filters.tag));
-  const base = query(cardsCol, ...clauses, orderBy('createdAt', 'desc'), limit(pageSize));
+  if (category) clauses.push(where('category', '==', category));
+  if (tag) clauses.push(where('tags', 'array-contains', tag));
 
-  const q =
-    startAfterCreatedAt != null
-      ? query(base, startAfter(Timestamp.fromMillis(startAfterCreatedAt)))
-      : base;
+  let q;
+
+  if (hasSearch) {
+    // ---------- SEARCH MODE (titleSearch prefix) ----------
+    const normalizedSearch = makeTitleSearch(searchTerm!.trim());
+
+    // base query: titleSearch range
+    let base = query(
+      cardsCol,
+      ...clauses,
+      orderBy('titleSearch'),
+      endAt(normalizedSearch + '\uf8ff'),
+      limit(pageSize),
+    );
+
+    // first page vs next pages
+    if (startAfterTitle) {
+      base = query(base, startAfter(startAfterTitle));
+    } else {
+      base = query(base, startAt(normalizedSearch));
+    }
+
+    q = base;
+  } else {
+    // ---------- BROWSE MODE (createdAt desc) ----------
+    let base = query(cardsCol, ...clauses, orderBy('createdAt', 'desc'), limit(pageSize));
+
+    if (startAfterCreatedAt != null) {
+      base = query(base, startAfter(Timestamp.fromMillis(startAfterCreatedAt)));
+    }
+
+    q = base;
+  }
 
   try {
     const snap = await getDocs(q);
@@ -61,18 +103,78 @@ export async function listRecipeCardsByOwnerPaged(
         ratingCategories: x.ratingCategories ?? null,
         createdAt: toMillis(x.createdAt),
         updatedAt: toMillis(x.updatedAt),
+        // NOTE: we don't need to expose titleSearch in RecipeCard
       };
     });
 
     const last = snap.docs.at(-1);
-    const nextStartAfter = last ? toMillis((last.data() as any).createdAt) : null;
+    let nextStartAfterCreatedAt: number | null = null;
+    let nextStartAfterTitle: string | null = null;
 
-    return { items, nextStartAfter };
+    if (last) {
+      const data = last.data() as any;
+
+      if (hasSearch) {
+        nextStartAfterTitle = data.titleSearch ?? null;
+      } else {
+        nextStartAfterCreatedAt = toMillis(data.createdAt);
+      }
+    }
+
+    return { items, nextStartAfterCreatedAt, nextStartAfterTitle };
   } catch (e) {
     console.error('[cards paged] query failed:', e);
     throw e;
   }
 }
+
+// export async function listRecipeCardsByOwnerPaged(
+//   uid: string,
+//   pageSize = 24,
+//   startAfterCreatedAt?: number | null,
+//   filters: { category?: string; tag?: string } = {},
+// ) {
+//   const clauses = [where('authorId', '==', uid)];
+
+//   if (filters.category) clauses.push(where('category', '==', filters.category));
+//   if (filters.tag) clauses.push(where('tags', 'array-contains', filters.tag));
+//   const base = query(cardsCol, ...clauses, orderBy('createdAt', 'desc'), limit(pageSize));
+
+//   const q =
+//     startAfterCreatedAt != null
+//       ? query(base, startAfter(Timestamp.fromMillis(startAfterCreatedAt)))
+//       : base;
+
+//   try {
+//     const snap = await getDocs(q);
+
+//     const items: RecipeCard[] = snap.docs.map((d) => {
+//       const x = d.data() as any;
+//       return {
+//         id: d.id,
+//         authorId: x.authorId,
+//         title: x.title,
+//         titleSearch: makeTitleSearch(x.title),
+//         category: x.category,
+//         tags: x.tags ?? [],
+//         difficulty: x.difficulty ?? null,
+//         imageUrl: x.imageUrl ?? null,
+//         excerpt: x.excerpt ?? null,
+//         ratingCategories: x.ratingCategories ?? null,
+//         createdAt: toMillis(x.createdAt),
+//         updatedAt: toMillis(x.updatedAt),
+//       };
+//     });
+
+//     const last = snap.docs.at(-1);
+//     const nextStartAfter = last ? toMillis((last.data() as any).createdAt) : null;
+
+//     return { items, nextStartAfter };
+//   } catch (e) {
+//     console.error('[cards paged] query failed:', e);
+//     throw e;
+//   }
+// }
 
 export async function getRecipe(id: string): Promise<RecipeEntity | null> {
   const ref = doc(recipesCol, id);
@@ -83,6 +185,7 @@ export async function getRecipe(id: string): Promise<RecipeEntity | null> {
     id: snap.id,
     authorId: d.authorId,
     title: d.title,
+    titleSearch: makeTitleSearch(d.title),
     category: d.category,
     tags: d.tags ?? [],
     difficulty: d.difficulty ?? null,
@@ -130,6 +233,7 @@ export async function addRecipePair(data: CreateRecipeInput) {
     id: recipeRef.id,
     authorId: cardDoc.authorId,
     title: cardDoc.title,
+    titleSearch: makeTitleSearch(cardDoc.title),
     category: cardDoc.category,
     tags: cardDoc.tags,
     ...cardDoc,

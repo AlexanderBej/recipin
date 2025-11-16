@@ -3,7 +3,7 @@ import React from 'react';
 import { CreateRecipeForm, StepThreeProps } from '../create-recipe.misc';
 import { Input, Select, SelectOption, Textarea } from '@shared/ui';
 import { CATEGORY_META } from '@api/misc';
-import { TagChips } from '@components';
+import { TagSheet } from '@components';
 
 import './basic-info.styles.scss';
 
@@ -74,7 +74,7 @@ const BasicInfo: React.FC<StepThreeProps> = ({ formData, handleChange, setFormDa
 
       <Input name="imgURL" label="Image URL" value={formData.imageURL} onChange={handleChange} />
       <span className="tags-label">Tags</span>
-      <TagChips selected={formData.tags ?? []} onChange={handleTagsChange} />
+      <TagSheet selected={formData.tags ?? []} onChange={handleTagsChange} />
     </div>
   );
 };

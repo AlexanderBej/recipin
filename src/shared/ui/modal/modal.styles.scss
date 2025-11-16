@@ -1,85 +1,84 @@
-// @use '../../../styles/tokens.scss' as *;
+@use '../../../styles/global.scss' as *;
 
-// .tt-modal__overlay {
-//   position: fixed;
-//   inset: 0;
-//   background: rgba(0, 0, 0, 0.4);
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   z-index: 1000;
-//   animation: fadeIn $transition-normal;
-// }
+.tt-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn $transition-normal;
+}
 
-// .tt-modal {
-//   @include dashboard-card($radius: $radius-md, $pad: $spacing-5);
-//   position: relative;
-//   width: 90%;
-//   max-height: 90vh;
-//   animation: slideUp $transition-normal;
+.tt-modal {
+  @include dashboard-card($radius: $radius-md, $pad: $spacing-5);
+  position: relative;
+  width: 90%;
+  max-height: 90vh;
+  animation: slideUp $transition-normal;
 
-//   &__header {
-//     font-family: $font-heading;
-//     font-size: $font-size-h3;
-//     font-weight: $font-weight-semibold;
-//     margin-bottom: $spacing-3;
-//     @include themed(color, color-text-secondary, $color-text-secondary);
-//   }
+  &__header {
+    font-family: $font-heading;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-3;
+    @include themed(color, color-text-secondary, $color-text-secondary);
+  }
 
-//   &__underline {
-//     margin-bottom: $spacing-4;
-//   }
+  &__underline {
+    margin-bottom: $spacing-4;
+  }
 
-//   &__body {
-//     @include themed(color, color-text-secondary, $color-text-secondary);
-//     font-family: $font-body;
-//     line-height: $line-height-base;
-//   }
+  &__body {
+    @include themed(color, color-text-secondary, $color-text-secondary);
+    font-family: $font-body;
+    line-height: $line-height-base;
+  }
 
-//   &__close {
-//     position: absolute;
-//     top: $spacing-5;
-//     right: $spacing-5;
-//     background: none;
-//     border: none;
-//     @include themed(color, color-text-secondary, $color-text-secondary);
-//     font-size: 1.5rem;
-//     cursor: pointer;
-//     transition: color $transition-fast;
+  &__close {
+    position: absolute;
+    top: $spacing-5;
+    right: $spacing-5;
+    background: none;
+    border: none;
+    @include themed(color, color-text-secondary, $color-text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color $transition-fast;
 
-//     &:hover {
-//       color: $color-primary-dark;
-//     }
-//   }
-// }
+    &:hover {
+      color: $color-primary-dark;
+    }
+  }
+}
 
-// @keyframes fadeIn {
-//   from {
-//     opacity: 0;
-//   }
-//   to {
-//     opacity: 1;
-//   }
-// }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
-// @keyframes slideUp {
-//   from {
-//     opacity: 0;
-//     transform: translateY(24px);
-//   }
-//   to {
-//     opacity: 1;
-//     transform: translateY(0);
-//   }
-// }
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-// // Optional mobile bottom-sheet style
-// @media (max-width: $breakpoint-tablet) {
-//   .tt-modal {
-//     border-bottom-left-radius: 0;
-//     border-bottom-right-radius: 0;
-//     width: 100%;
-//     height: auto;
-//     margin: 0 $spacing-2;
-//   }
-// }
+// Optional mobile bottom-sheet style
+@media (max-width: $breakpoint-tablet) {
+  .tt-modal {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    width: 100%;
+    height: auto;
+    margin: 0 $spacing-2;
+  }
+}

@@ -1,0 +1,57 @@
+@use '../../styles/global.scss' as *;
+
+.planner-table {
+  margin-top: $spacing-6;
+}
+
+.planner-day-container {
+  margin-top: $spacing-6;
+  // background-color: $color-bg-card;
+  border-radius: $radius-lg;
+
+  .planner-day-header {
+    padding: $spacing-4;
+    background-color: $color-bg-card;
+    border-bottom: 1px solid $color-neutral;
+    border-radius: $radius-lg;
+  }
+
+  .planner-day-content {
+    display: grid;
+    gap: $spacing-4;
+    margin-top: $spacing-4;
+
+    .meal-box {
+      border: 1px solid $color-primary;
+      border-radius: $radius-lg;
+      min-height: 100px;
+      padding: $spacing-2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 80%;
+      margin: auto;
+
+      .meal-type {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: $spacing-1;
+      }
+    }
+
+    .snack-box {
+      display: inline-flex;
+      width: 100%;
+      gap: $spacing-2;
+      align-items: center;
+
+      .snack-divider {
+        height: 1px;
+        flex: 1;
+        background-color: $color-text-secondary;
+      }
+    }
+  }
+}

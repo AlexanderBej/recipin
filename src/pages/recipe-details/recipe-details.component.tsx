@@ -14,7 +14,7 @@ import { selectRecipesCurrent } from '@store/recipes-store';
 import { Chip, RecIcon } from '@shared/ui';
 import { buildIngredient, formatHoursAndMinutes, getCssVar, toDateOrNull } from '@shared/utils';
 import { CATEGORY_META } from '@api/misc';
-import { RatingsSheet } from '@components';
+import { PlannerModal, RatingsSheet } from '@components';
 import { GroceryItem } from '@api/models';
 import { AppDispatch } from '@api/types';
 import { addGroceryRecipe, makeSelectHasGroceryRecipe } from '@store/grocery-store';
@@ -122,7 +122,10 @@ const RecipeDetails: React.FC = () => {
 
       <hr className="divider" />
       <div className="description-container">
-        <h3 className="container-heading">Description</h3>
+        <div className="description-heading">
+          <h3 className="container-heading">Description</h3>
+          <PlannerModal recipe={recipe} />
+        </div>
         <p>{recipe?.description}</p>
         <p className="last-update">
           {updatedAtDate

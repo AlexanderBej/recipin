@@ -6,15 +6,15 @@ import { TAGS } from '@api/misc';
 import { TagCategory } from '@api/types';
 import { BottomSheet, Chip, RecIcon } from '@shared/ui';
 
-import './tag-chips.styles.scss';
+import './tag-sheet.styles.scss';
 
-interface TagChipsProps {
+interface TagSheetProps {
   selected: string[]; // current selected tags
   onChange: (next: string[]) => void; // notify parent
   categories?: TagCategory[]; // optional subset to show
 }
 
-const TagChips: React.FC<TagChipsProps> = ({ selected, onChange, categories }) => {
+const TagSheet: React.FC<TagSheetProps> = ({ selected, onChange, categories }) => {
   const cats: TagCategory[] = categories ?? (Object.keys(TAGS) as TagCategory[]);
 
   const isSelected = useCallback((tag: string) => selected.includes(tag), [selected]);
@@ -97,4 +97,4 @@ const TagChips: React.FC<TagChipsProps> = ({ selected, onChange, categories }) =
   );
 };
 
-export default TagChips;
+export default TagSheet;
