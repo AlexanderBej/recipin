@@ -3,7 +3,12 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@lib/firebase';
 import { AppDispatch } from '@store/store';
 import { setAuthLoading, userSignedIn, userSignedOut } from '@store/auth-store';
-import { fetchMyFavorites, fetchMyRecipeCardsPage, resetMine } from '@store/recipes-store';
+import {
+  fetchMyFavorites,
+  fetchMyRecipeCardsPage,
+  resetMine,
+  startBootLoading,
+} from '@store/recipes-store';
 
 export const initApp = (dispatch: AppDispatch) => {
   dispatch(setAuthLoading());
@@ -11,7 +16,7 @@ export const initApp = (dispatch: AppDispatch) => {
   const unsubAuth = onAuthStateChanged(auth, async (fbUser) => {
     // clear list on every auth change
     dispatch(resetMine());
-
+    dispatch(startBootLoading());
     console.log(fbUser?.uid);
 
     dispatch(fetchMyRecipeCardsPage({ uid: fbUser?.uid ?? '' }));

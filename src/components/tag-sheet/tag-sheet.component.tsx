@@ -12,9 +12,15 @@ interface TagSheetProps {
   selected: string[]; // current selected tags
   onChange: (next: string[]) => void; // notify parent
   categories?: TagCategory[]; // optional subset to show
+  closeOnOne?: boolean;
 }
 
-const TagSheet: React.FC<TagSheetProps> = ({ selected, onChange, categories }) => {
+const TagSheet: React.FC<TagSheetProps> = ({
+  selected,
+  onChange,
+  categories,
+  closeOnOne = false,
+}) => {
   const cats: TagCategory[] = categories ?? (Object.keys(TAGS) as TagCategory[]);
 
   const isSelected = useCallback((tag: string) => selected.includes(tag), [selected]);
@@ -22,6 +28,7 @@ const TagSheet: React.FC<TagSheetProps> = ({ selected, onChange, categories }) =
   const toggle = useCallback(
     (tag: string) => {
       const next = selected.includes(tag) ? selected.filter((t) => t !== tag) : [...selected, tag];
+      console.log('this called');
 
       onChange(next);
     },
@@ -73,7 +80,7 @@ const TagSheet: React.FC<TagSheetProps> = ({ selected, onChange, categories }) =
           })}
         </BottomSheet>
       </div>
-      {selected && selected.length > 0 && (
+      {selected && selected.length > 0 && selected[0] && (
         <div className="chips-row">
           <div className="selected-chips-list chip-list" aria-label="Selected tags">
             {selected.map((tag) => {

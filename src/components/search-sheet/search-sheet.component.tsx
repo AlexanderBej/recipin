@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
+import { FaPlus } from 'react-icons/fa';
+import { GoPlusCircle } from 'react-icons/go';
 
 import { BottomSheet, Input, RecIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
@@ -8,16 +9,21 @@ import { RecipeCard } from '@api/models';
 import { listRecipeCardsByOwnerPaged } from '@api/services';
 import { selectAuthUserId } from '@store/auth-store';
 import { RecipeCategory } from '@api/types';
+import { RecipeImg } from '@components';
 
 import './search-sheet.styles.scss';
-import { RecipeImg } from '@components';
-const placeholderImage = require('../../assets/img_placeholder.png');
 
 interface SearchSheetProps {
   selectedMealCategory: RecipeCategory;
+  onRecipeTap: (rec: RecipeCard) => void;
+  isMainMeal?: boolean;
 }
 
-const SearchSheet: React.FC<SearchSheetProps> = ({ selectedMealCategory }) => {
+const SearchSheet: React.FC<SearchSheetProps> = ({
+  selectedMealCategory,
+  onRecipeTap,
+  isMainMeal = true,
+}) => {
   const uid = useSelector(selectAuthUserId);
 
   const [recipes, setRecipes] = useState<RecipeCard[]>([]);
@@ -30,7 +36,7 @@ const SearchSheet: React.FC<SearchSheetProps> = ({ selectedMealCategory }) => {
       pageSize: 24,
       startAfterTitle: initial ? null : cursor,
       filters: {
-        category: selectedMealCategory, // 'breakfast' / 'lunch' / ...
+        // category: selectedMealCategory, // 'breakfast' / 'lunch' / ...
         searchTerm, // works both with '' (browse-by-title) and non-empty
       },
     });
@@ -50,7 +56,11 @@ const SearchSheet: React.FC<SearchSheetProps> = ({ selectedMealCategory }) => {
       <BottomSheet
         trigger={
           <button type="button" aria-label="Open search recipe sheet">
-            <RecIcon icon={FaPlus} size={32} color={getCssVar('--color-primary')} />
+            <RecIcon
+              icon={isMainMeal ? FaPlus : GoPlusCircle}
+              size={32}
+              color={getCssVar(isMainMeal ? '--color-primary' : '--color-text-primary')}
+            />
           </button>
         }
         title="Search recipe"
@@ -70,10 +80,19 @@ const SearchSheet: React.FC<SearchSheetProps> = ({ selectedMealCategory }) => {
           <div className="search-results">
             {recipes &&
               recipes.map((rec) => (
-                <div key={rec.id} className="recipe-row">
+                <button
+                  key={rec.id}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onRecipeTap(rec);
+                  }}
+                  className="recipe-row"
+                >
                   <RecipeImg src={rec.imageUrl} alt={rec.title} variant="thumb" />
                   <h3>{rec.title}</h3>
-                </div>
+                </button>
               ))}
           </div>
         </div>

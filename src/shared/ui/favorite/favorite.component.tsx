@@ -38,7 +38,7 @@ const Favorite: React.FC<FavoriteProps> = ({ isFavorite, recipeId, className, sm
       <RecIcon
         icon={isFavorite ? MdFavorite : MdFavoriteBorder}
         size={small ? 24 : 32}
-        color={getCssVar('--color-primary')}
+        color={getCssVar('--color-error')}
       />
     </button>
   );

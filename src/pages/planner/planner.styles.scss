@@ -53,5 +53,25 @@
         background-color: $color-text-secondary;
       }
     }
+
+    .recipe-box {
+      width: 100%;
+      border-color: transparent;
+      background-color: $color-bg-card;
+      padding: 0;
+
+      .recipe-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: $spacing-5;
+        color: $color-text-primary;
+
+        .planner-img {
+          height: 100px;
+        }
+      }
+    }
   }
 }

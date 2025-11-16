@@ -2,8 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { parseISO, isToday, isYesterday, isTomorrow, format } from 'date-fns';
 import { GoPlusCircle } from 'react-icons/go';
+import clsx from 'clsx';
+import { useNavigate } from 'react-router';
 
 import {
+  addPlanItemThunk,
   initializePlanner,
   makeSelectPlanForDate,
   selectPlannerWeekStart,
@@ -13,14 +16,18 @@ import { getCssVar, getWeekDays, getWeekStart } from '@shared/utils';
 import { AppDispatch, MealSlot, RootState } from '@api/types';
 import { PeriodSwitcher, WeekTable } from '@features/planner';
 import { RecIcon } from '@shared/ui';
-import { SearchSheet } from '@components';
+import { RecipeImg, SearchSheet } from '@components';
 import { selectAuthUserId } from '@store/auth-store';
 import { MEAL_SLOTS } from '@api/misc';
+import { PlanItem, RecipeCard } from '@api/models';
+import { fetchRecipeById } from '@store/recipes-store';
 
 import './planner.styles.scss';
+import { s } from 'react-router/dist/development/index-react-server-client-BSxMvS7Z';
 
 const Planner: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const uid = useSelector(selectAuthUserId);
 
@@ -85,6 +92,25 @@ const Planner: React.FC = () => {
     return format(date, 'EEE, dd MMM');
   };
 
+  const handleSearchedRecipe = async (rec: RecipeCard, meal: MealSlot) => {
+    if (!uid) return;
+    const planItem: Omit<PlanItem, 'id'> = {
+      date: selectedDateISO,
+      meal: meal,
+      recipeId: rec.id,
+      recipeName: rec.title,
+      recipeImgUrl: rec.imageUrl,
+      userId: uid,
+    };
+
+    await dispatch(addPlanItemThunk({ uid, item: planItem }));
+  };
+
+  const handleRecipeTap = (recipeId: string) => {
+    dispatch(fetchRecipeById(recipeId));
+    navigate(`/recipe/${recipeId}`);
+  };
+
   return (
     <div className="planner">
       <PeriodSwitcher
@@ -111,24 +137,40 @@ const Planner: React.FC = () => {
             const isSnack = meal === 'snacks';
             const planItem = getItemForSlot(meal);
 
+            const showBanner = !isSnack || (isSnack && planItem);
+
+            const className = clsx({
+              'recipe-box': planItem,
+              'snack-box': isSnack && !planItem,
+              'meal-box': showBanner,
+            });
+
             return (
-              <div key={index} className={isSnack ? 'snack-box' : 'meal-box'}>
-                {!isSnack && <h4 className="meal-type">{meal}</h4>}
+              <div key={index} className={className}>
+                {showBanner && <h4 className="meal-type">{meal}</h4>}
                 {planItem ? (
-                  <div className="recipe-info"></div>
-                ) : isSnack ? (
-                  <>
-                    <div className="snack-divider" />
-                    <button aria-label="Add recipe to snack slot">
-                      <RecIcon
-                        icon={GoPlusCircle}
-                        size={32}
-                        color={getCssVar('--color-text-primary')}
-                      />
-                    </button>
-                  </>
+                  <button
+                    aria-label="Go to recipe details"
+                    onClick={() => handleRecipeTap(planItem.recipeId)}
+                    className="recipe-btn"
+                  >
+                    <RecipeImg
+                      src={planItem.recipeImgUrl}
+                      alt={planItem.recipeName}
+                      variant="square"
+                      className="planner-img"
+                    />
+                    <h3>{planItem.recipeName}</h3>
+                  </button>
                 ) : (
-                  <SearchSheet selectedMealCategory={meal} />
+                  <>
+                    {isSnack && <div className="snack-divider" />}
+                    <SearchSheet
+                      selectedMealCategory={meal}
+                      onRecipeTap={(rec) => handleSearchedRecipe(rec, meal)}
+                      isMainMeal={!isSnack}
+                    />
+                  </>
                 )}
               </div>
             );

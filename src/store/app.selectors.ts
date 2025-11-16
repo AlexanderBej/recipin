@@ -1,11 +1,11 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import { selectAuthLoading, selectAuthStatus } from './auth-store/auth.selectors';
-import { selectRecipesLoading } from './recipes-store';
+import { selectRecipesBootLoading } from './recipes-store';
 
 // 1) Single “key” that fully describes boot state (always a stable string)
 export const selectBootKey = createSelector(
-  [selectAuthStatus, selectAuthLoading, selectRecipesLoading],
+  [selectAuthStatus, selectAuthLoading, selectRecipesBootLoading],
   (authStatus, authLoading, recipesLoading) => {
     if (authStatus === 'idle' || authLoading) return 'boot:auth';
     if (authStatus === 'unauthenticated') return 'ready:guest';

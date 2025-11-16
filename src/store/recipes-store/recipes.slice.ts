@@ -23,14 +23,32 @@ export const cardsAdapter = createEntityAdapter<RecipeCard, string>({
   sortComparer: (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
 });
 
+type FetchMyRecipeCardsPageArgs = {
+  uid: string;
+  pageSize?: number;
+  reset?: boolean;
+  filters?: {
+    category?: string;
+    tag?: string;
+    searchTerm?: string;
+  };
+};
+
 type PageMeta = {
   loading: boolean;
   error?: string | null;
-  nextStartAfter?: number | null;
   pageSize: number;
+  nextStartAfterCreatedAt: number | null;
+  nextStartAfterTitle: string | null;
+  lastFilters?: {
+    category?: string;
+    tag?: string;
+    searchTerm?: string;
+  } | null;
 };
 
 type RecipesState = {
+  bootLoading: boolean;
   cards: ReturnType<typeof cardsAdapter.getInitialState>;
   favorites: RecipeCard[];
   mine: PageMeta;
@@ -38,25 +56,49 @@ type RecipesState = {
 };
 
 const initialState: RecipesState = {
+  bootLoading: false,
   cards: cardsAdapter.getInitialState(),
-  mine: { loading: false, error: null, nextStartAfter: null, pageSize: 24 },
+  mine: {
+    loading: false,
+    error: null,
+    nextStartAfterCreatedAt: null,
+    nextStartAfterTitle: null,
+    lastFilters: null,
+    pageSize: 24,
+  },
   favorites: [],
   currentRecipe: null,
 };
 
-export const fetchMyRecipeCardsPage = createAsyncThunk(
+export const fetchMyRecipeCardsPage = createAppAsyncThunk<
+  ListRecipeCardsResult,
+  FetchMyRecipeCardsPageArgs
+>(
   'recipes/fetchMinePage',
-  async ({ uid, pageSize }: { uid: string; pageSize?: number }, { getState }) => {
-    const state = getState() as RootState;
-    const { nextStartAfter } = state.recipes.mine;
-    const size = pageSize ?? state.recipes.mine.pageSize;
+  async ({ uid, pageSize, reset = false, filters }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const mine = state.recipes.mine; // adjust path if different
 
-    const payload: ListRecipeCardsOptions = {
-      pageSize: size,
-      startAfterCreatedAt: nextStartAfter,
-    };
-    const res = await listRecipeCardsByOwnerPaged(uid, payload);
-    return res;
+      const size = pageSize ?? mine.pageSize;
+
+      const hasSearch = !!filters?.searchTerm?.trim();
+
+      const payload: ListRecipeCardsOptions = {
+        pageSize: size,
+        filters,
+        // when reset, always start fresh
+        startAfterCreatedAt: reset || hasSearch ? null : mine.nextStartAfterCreatedAt,
+        startAfterTitle: reset || !hasSearch ? null : mine.nextStartAfterTitle,
+      };
+
+      const res = await listRecipeCardsByOwnerPaged(uid, payload);
+
+      // include filters in the payload so reducer can remember them if it wants
+      return { ...res, filters };
+    } catch (error: any) {
+      return rejectWithValue(error.message ?? 'Failed to fetch my recipe cards page');
+    }
   },
 );
 
@@ -139,11 +181,16 @@ const recipesSlice = createSlice({
   name: 'recipes',
   initialState,
   reducers: {
+    startBootLoading(state) {
+      state.bootLoading = true;
+    },
     resetMine(state) {
       state.mine = {
         loading: false,
         error: null,
-        nextStartAfter: null,
+        nextStartAfterCreatedAt: null,
+        nextStartAfterTitle: null,
+        lastFilters: null,
         pageSize: state.mine.pageSize,
       };
       cardsAdapter.removeAll(state.cards);
@@ -155,16 +202,30 @@ const recipesSlice = createSlice({
         state.mine.loading = true;
         state.mine.error = null;
       })
-      .addCase(
-        fetchMyRecipeCardsPage.fulfilled,
-        (state, action: PayloadAction<ListRecipeCardsResult>) => {
+      .addCase(fetchMyRecipeCardsPage.fulfilled, (state, action) => {
+        // Now you can use meta safely:
+        const { reset, filters } = action.meta.arg as FetchMyRecipeCardsPageArgs;
+
+        if (reset) {
+          // new search / filters -> replace all
+          cardsAdapter.setAll(state.cards, action.payload.items);
+        } else {
+          // pagination -> append/merge
           cardsAdapter.upsertMany(state.cards, action.payload.items);
-          state.mine.nextStartAfter = action.payload.nextStartAfterCreatedAt ?? null;
-          state.mine.loading = false;
-        },
-      )
+        }
+
+        state.mine.nextStartAfterCreatedAt = action.payload.nextStartAfterCreatedAt ?? null;
+        state.mine.nextStartAfterTitle = action.payload.nextStartAfterTitle ?? null;
+        state.mine.lastFilters = {
+          searchTerm: filters?.searchTerm,
+          tag: filters?.tag,
+        };
+        state.mine.loading = false;
+        state.bootLoading = false;
+      })
       .addCase(fetchMyRecipeCardsPage.rejected, (state, action) => {
         state.mine.loading = false;
+        state.bootLoading = false;
         state.mine.error = action.error.message ?? 'Failed to load recipes';
       })
 
@@ -268,5 +329,5 @@ const recipesSlice = createSlice({
   },
 });
 
-export const { resetMine } = recipesSlice.actions;
+export const { startBootLoading, resetMine } = recipesSlice.actions;
 export default recipesSlice.reducer;
