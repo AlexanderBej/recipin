@@ -73,7 +73,6 @@ const BasicInfo: React.FC<StepThreeProps> = ({ formData, handleChange, setFormDa
       />
 
       <Input name="imgURL" label="Image URL" value={formData.imageURL} onChange={handleChange} />
-      <span className="tags-label">Tags</span>
       <TagSheet selected={formData.tags ?? []} onChange={handleTagsChange} />
     </div>
   );

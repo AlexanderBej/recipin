@@ -6,6 +6,7 @@ import { addRecipePair } from '@api/services';
 import { CreateRecipeInput } from '@api/types';
 
 import './import.styles.scss';
+import { Button } from '@shared/ui';
 
 const Import: React.FC = () => {
   const [raw, setRaw] = useState('');
@@ -70,19 +71,25 @@ const Import: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: 16 }}>
+    <div className="import-page">
       <h2>Import recipes</h2>
       <p>Paste JSON array or JSON Lines (one recipe per line).</p>
       <textarea
         value={raw}
         onChange={(e) => setRaw(e.target.value)}
         placeholder='[ { "title": "...", ... }, ... ]'
-        style={{ width: '100%', height: 240, fontFamily: 'monospace' }}
+        className="import-textarea"
       />
-      <div style={{ marginTop: 12 }}>
-        <button onClick={onImport}>Import</button>
+      <div className="button-container">
+        <Button variant="primary" className="import-btn" onClick={onImport}>
+          Import
+        </Button>
       </div>
-      <pre style={{ whiteSpace: 'pre-wrap', marginTop: 12 }}>{log.join('\n')}</pre>
+      {log && log.length > 0 ? (
+        <pre className="log-content">{log.join('\n')}</pre>
+      ) : (
+        <p className="log-content">Import and see what happens</p>
+      )}
     </div>
   );
 };

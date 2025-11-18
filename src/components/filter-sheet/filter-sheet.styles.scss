@@ -1,0 +1,39 @@
+@use '../../styles/global.scss' as *;
+
+.clear-all-btn {
+  color: $color-error;
+}
+
+.filter-sheet {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  .filter-options {
+    overflow: auto;
+    height: calc(100% - 88px);
+  }
+
+  .filter-btn-wrapper {
+    padding: 24px;
+    position: fixed;
+    bottom: 0;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .apply-filter-btn {
+      width: 100%;
+    }
+  }
+
+  .load-more-btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: $spacing-4;
+  }
+}

@@ -110,10 +110,23 @@
     align-items: flex-start;
   }
 
+  .ingredient-line {
+    margin-bottom: $spacing-1;
+  }
+
   .ingredients-heading {
     display: flex;
     width: 100%;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .step-line {
+    margin-bottom: $spacing-2;
+    margin-left: $spacing-3;
+
+    &::marker {
+      color: $color-primary; /* or any other color value (hex, rgb, etc.) */
+    }
   }
 }

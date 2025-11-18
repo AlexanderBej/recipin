@@ -11,7 +11,7 @@ import {
   listFavoriteRecipes,
 } from '@api/services';
 import { createAppAsyncThunk, CreateRecipeInput, RatingCategory, RootState } from '@api/types';
-import { ListRecipeCardsOptions, ListRecipeCardsResult } from '@api/models';
+import { ListRecipeCardsOptions, ListRecipeCardsResult, RecipeCardFilters } from '@api/models';
 
 export const cardsAdapter = createEntityAdapter<RecipeCard, string>({
   selectId: (r) => r.id,
@@ -22,11 +22,7 @@ type FetchMyRecipeCardsPageArgs = {
   uid: string;
   pageSize?: number;
   reset?: boolean;
-  filters?: {
-    category?: string;
-    tag?: string;
-    searchTerm?: string;
-  };
+  filters?: RecipeCardFilters;
 };
 
 type PageMeta = {
@@ -35,11 +31,7 @@ type PageMeta = {
   pageSize: number;
   nextStartAfterCreatedAt: number | null;
   nextStartAfterTitle: string | null;
-  lastFilters?: {
-    category?: string;
-    tag?: string;
-    searchTerm?: string;
-  } | null;
+  lastFilters?: RecipeCardFilters | null;
 };
 
 type RecipesState = {
@@ -179,6 +171,9 @@ const recipesSlice = createSlice({
     startBootLoading(state) {
       state.bootLoading = true;
     },
+    startOptimisticLoading(state) {
+      state.mine.loading = true;
+    },
     resetMine(state) {
       state.mine = {
         loading: false,
@@ -214,6 +209,8 @@ const recipesSlice = createSlice({
         state.mine.lastFilters = {
           searchTerm: filters?.searchTerm,
           tag: filters?.tag,
+          category: filters?.category,
+          difficulty: filters?.difficulty,
         };
         state.mine.loading = false;
         state.bootLoading = false;
@@ -324,5 +321,5 @@ const recipesSlice = createSlice({
   },
 });
 
-export const { startBootLoading, resetMine } = recipesSlice.actions;
+export const { startBootLoading, startOptimisticLoading, resetMine } = recipesSlice.actions;
 export default recipesSlice.reducer;

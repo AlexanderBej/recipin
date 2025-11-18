@@ -1,11 +1,11 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import { LocalSpinner } from '../spinners';
+import { Spinner } from '../spinner';
 
 import './button.styles.scss';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'neutral';
 export type ButtonShape = 'round' | 'square';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -37,7 +37,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading ? <LocalSpinner /> : children}
+      {isLoading ? <Spinner type="local" /> : children}
     </button>
   );
 };

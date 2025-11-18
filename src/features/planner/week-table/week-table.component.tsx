@@ -49,8 +49,6 @@ const WeekTable: React.FC<WeekTableProps> = ({
 
   const today = new Date();
 
-  console.log('today', today.getDate());
-
   return (
     <table className="planner-week-table">
       <thead>
@@ -68,12 +66,7 @@ const WeekTable: React.FC<WeekTableProps> = ({
               <button
                 type="button"
                 aria-label="Select day"
-                onClick={() => {
-                  console.log('selectedDate', selectedDate);
-                  console.log('day.iso', day.iso);
-
-                  setSelectedDate(day.iso);
-                }}
+                onClick={() => setSelectedDate(day.iso)}
                 className="week-heading"
               >
                 <span>{day.labelDay}</span>

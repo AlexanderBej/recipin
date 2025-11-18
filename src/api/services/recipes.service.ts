@@ -44,13 +44,17 @@ export async function listRecipeCardsByOwnerPaged(
     filters = {},
   }: ListRecipeCardsOptions = {},
 ): Promise<ListRecipeCardsResult> {
-  const { category, tag, searchTerm } = filters;
+  const { category, tag, searchTerm, difficulty } = filters;
   const hasSearch = !!searchTerm && searchTerm.trim().length > 0;
 
   const clauses = [where('authorId', '==', uid)];
 
   if (category) clauses.push(where('category', '==', category));
   if (tag) clauses.push(where('tags', 'array-contains', tag));
+  if (difficulty) clauses.push(where('difficulty', '==', difficulty));
+
+  console.log('filters', filters);
+  console.log('clauses', clauses);
 
   let q;
 
@@ -197,13 +201,14 @@ export async function addRecipePair(data: CreateRecipeInput) {
   const cardRef = doc(cardsCol, recipeRef.id); // reuse same ID
 
   const now = { createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
-
+  const titleSearch = makeTitleSearch(data.title);
   const recipeDoc: DocumentData = { ...data, ...now, isPublic: data.isPublic ?? false };
   batch.set(recipeRef, recipeDoc);
 
   const cardDoc: DocumentData = {
     authorId: data.authorId,
     title: data.title,
+    titleSearch,
     category: data.category,
     tags: data.tags ?? [],
     difficulty: data.difficulty ?? null,
@@ -220,7 +225,7 @@ export async function addRecipePair(data: CreateRecipeInput) {
     id: recipeRef.id,
     authorId: cardDoc.authorId,
     title: cardDoc.title,
-    titleSearch: makeTitleSearch(cardDoc.title),
+    titleSearch,
     category: cardDoc.category,
     tags: cardDoc.tags,
     isFavorite: false,

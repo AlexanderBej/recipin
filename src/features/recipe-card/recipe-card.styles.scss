@@ -1,0 +1,16 @@
+@use '../../styles/global.scss' as *;
+
+.recipe-card-btn {
+  text-align: left;
+  color: $color-text-primary;
+  border-radius: $radius-md;
+  position: relative;
+}
+
+.detailed-card {
+  width: 100%;
+  height: 170px;
+  background-color: $color-bg-card;
+  background: linear-gradient(180deg, $color-bg-card 0%, $color-bg-card-light 100%);
+  display: flex;
+}

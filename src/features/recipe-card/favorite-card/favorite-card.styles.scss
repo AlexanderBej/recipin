@@ -1,0 +1,20 @@
+@use '../../../styles/global.scss' as *;
+
+.favorite-img {
+  width: 220px;
+}
+
+.favorite-details {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  margin-top: $spacing-3;
+
+  .fav-rec-title {
+    font-size: 14px;
+  }
+
+  .fav-rating-container {
+    margin-top: $spacing-2;
+  }
+}

@@ -1,0 +1,61 @@
+@use '../../../styles/global.scss' as *;
+
+.recipe-card-fav {
+  left: $spacing-2;
+  right: unset;
+}
+
+.det-card-details {
+  padding: $spacing-2 $spacing-3;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100px;
+
+  .det-card-recipe-title {
+    margin-bottom: $spacing-2;
+  }
+
+  .det-card-category-box {
+    display: inline-flex;
+    gap: $spacing-1;
+    width: fit-content;
+    padding: $spacing-1;
+    border: 1px solid;
+    font-size: 9px;
+    align-items: center;
+    border-radius: $radius-sm;
+    margin-bottom: $spacing-2;
+  }
+
+  .truncate-p {
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2; /* number of lines you want */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 12px;
+  }
+
+  .det-card-row {
+    display: inline-flex;
+    width: 100%;
+    font-size: 11px;
+    margin-top: $spacing-2;
+    justify-content: space-between;
+  }
+
+  .det-card-tags-container {
+    margin: 0;
+    display: inline-flex;
+    gap: $spacing-2;
+    margin-top: auto;
+    overflow: hidden;
+
+    .card-tag {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+  }
+}

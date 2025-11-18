@@ -11,7 +11,7 @@ import { MdOutlineLocalGroceryStore } from 'react-icons/md';
 import { MdLocalGroceryStore } from 'react-icons/md';
 
 import { removeRecipe, selectRecipesCurrent } from '@store/recipes-store';
-import { Chip, Favorite, RecIcon } from '@shared/ui';
+import { CheckboxInput, Chip, Favorite, RecIcon } from '@shared/ui';
 import { buildIngredient, formatHoursAndMinutes, getCssVar, toDateOrNull } from '@shared/utils';
 import { CATEGORY_META } from '@api/misc';
 import { ConfirmaModal, PlannerModal, RatingsSheet, RecipeImg } from '@components';
@@ -151,7 +151,9 @@ const RecipeDetails: React.FC = () => {
         </div>
         <ul>
           {recipe?.ingredients.map((ingr, index) => (
-            <li key={index}>{buildIngredient(ingr)}</li>
+            <li className="ingredient-line" key={index}>
+              <CheckboxInput checked label={buildIngredient(ingr)} />
+            </li>
           ))}
         </ul>
       </div>
@@ -161,7 +163,9 @@ const RecipeDetails: React.FC = () => {
         <h3 className="container-heading">Steps</h3>
         <ol>
           {recipe?.steps.map((step, index) => (
-            <li key={index}>{step}</li>
+            <li className="step-line" key={index}>
+              {step}
+            </li>
           ))}
         </ol>
       </div>

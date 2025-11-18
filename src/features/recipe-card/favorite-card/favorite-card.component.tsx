@@ -6,6 +6,7 @@ import { getRatingAverage } from '@shared/utils';
 import { RecipeImg } from '@components';
 
 import './favorite-card.styles.scss';
+
 interface FavoriteCardProps {
   recipe: RecipeCardModel;
 }
@@ -14,7 +15,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ recipe }) => {
   const total = getRatingAverage(recipe.ratingCategories);
 
   return (
-    <div className="favorite-card">
+    <>
       <Favorite isFavorite={recipe?.isFavorite ?? false} recipeId={recipe?.id ?? ''} />
       <RecipeImg
         src={recipe.imageUrl}
@@ -28,7 +29,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ recipe }) => {
           <StarRating value={total} onChange={() => {}} small showValue />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

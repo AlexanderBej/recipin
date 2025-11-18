@@ -16,7 +16,7 @@
       width: 100%;
       border: none;
       border-radius: $radius-lg;
-      border: 1px solid $color-bg-card-light;
+      border: 1px solid $color-bg-main;
 
       &:focus {
         outline: none;
@@ -29,6 +29,16 @@
       position: absolute;
       right: 14px;
       bottom: 15px;
+    }
+
+    &__small {
+      .form-select {
+        padding: $spacing-2 $spacing-4;
+      }
+
+      .select-chevron {
+        bottom: 6px;
+      }
     }
   }
 

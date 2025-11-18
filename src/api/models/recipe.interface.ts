@@ -1,4 +1,4 @@
-import { RatingCategory, RecipeCategory, RecipeDifficulty } from '@api/types';
+import { RatingCategory, RecipeCategory, RecipeDifficulty, TagCategory } from '@api/types';
 
 export interface RecipeCard {
   id: string;
@@ -32,8 +32,7 @@ export interface Ingredient {
   quantity?: string;
 }
 
-// export interface RecipeRating {
-//   categories: Partial<Record<RatingCategory, number>>; // integers 0..5
-//   total: number;                                        // sum(categories)
-//   updatedAt?: number;                                   // ms since epoch (keep it serializable)
-// };
+export interface TagDef {
+  id: string; // 'vegan'
+  label: string; // 'Vegan'
+}

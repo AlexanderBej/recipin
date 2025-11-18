@@ -85,7 +85,6 @@ const Create: React.FC = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    console.log(e);
     if (!userId) return;
     const payload: CreateRecipeInput = {
       title: formData.title,

@@ -77,6 +77,7 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
+  border-bottom: 1px solid $color-bg-main;
   padding: 4px var(--pad-x) 0;
 }
 .bs__title {

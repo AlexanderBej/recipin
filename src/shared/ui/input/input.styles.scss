@@ -46,8 +46,15 @@
     }
   }
 
+  .input-suffix {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+  }
+
   .input-with-prefix {
     padding-left: 50px;
+    padding-right: 50px;
   }
 }
 

@@ -20,6 +20,7 @@ interface SelectProps {
   required?: boolean;
   errors?: string;
   customClassName?: string;
+  small?: boolean;
   // eslint-disable-next-line , no-unused-vars
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   // Allow additional props (e.g., className, id)
@@ -35,6 +36,7 @@ const Select: React.FC<SelectProps> = ({
   errors,
   customClassName,
   required = false,
+  small = false,
   onChange,
   ...otherProps
 }) => {
@@ -49,7 +51,7 @@ const Select: React.FC<SelectProps> = ({
           {label} {required && <span className="text-red">*</span>}
         </label>
       )}
-      <div className="select-row">
+      <div className={clsx('select-row', { 'select-row__small': small })}>
         <select
           className="form-select"
           name={name}

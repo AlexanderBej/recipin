@@ -1,9 +1,11 @@
+import { RecipeCategory, RecipeDifficulty } from '@api/types';
 import { RecipeCard } from './recipe.interface';
 
 export interface RecipeCardFilters {
-  category?: string;
+  category?: RecipeCategory;
   tag?: string;
-  searchTerm?: string; // NEW
+  searchTerm?: string;
+  difficulty?: RecipeDifficulty;
 }
 
 export interface ListRecipeCardsOptions {

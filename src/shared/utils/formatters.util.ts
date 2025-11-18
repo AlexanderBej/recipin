@@ -49,3 +49,20 @@ export const buildIngredient = (ingredient: Ingredient): string => {
   }
   return item;
 };
+
+export function normalizeTagForStorage(tag: string): string {
+  return tag
+    .trim()
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // split camelCase → "SugarFree" → "Sugar Free"
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-') // replace spaces/dashes/underscores/etc with "-"
+    .replace(/-+/g, '-') // collapse multiple dashes
+    .replace(/^-|-$/g, ''); // trim leading/trailing dashes
+}
+
+export function displayTag(tag: string): string {
+  return tag
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}

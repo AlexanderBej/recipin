@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { NavLink } from 'react-router';
 
 import { selectAuthUser } from '@store/auth-store';
 
 import './profile.styles.scss';
-import { NavLink } from 'react-router';
 
 const Profile: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -15,13 +15,17 @@ const Profile: React.FC = () => {
         className="user-avatar"
         src={user?.photoURL ?? ''}
         alt={`${user?.displayName}`}
-        height={100}
-        width={100}
+        height={150}
+        width={150}
       />
-      <h2>{user?.displayName}</h2>
+      <h2 className="my-name">{user?.displayName}</h2>
 
       <div className="user-actions">
-        <NavLink to={'/import'}>Bulk Import</NavLink>
+        <div className="import">
+          <NavLink to={'/import'} className="import-link">
+            Bulk Import
+          </NavLink>
+        </div>
       </div>
     </div>
   );

@@ -1,16 +1,19 @@
 import React from 'react';
 import clsx from 'clsx';
 import { IoMdSearch } from 'react-icons/io';
+import { CiCircleRemove } from 'react-icons/ci';
 
-import './input.styles.scss';
 import { RecIcon } from '../icon';
 import { getCssVar } from '@shared/utils';
+
+import './input.styles.scss';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   className?: string;
   prefix?: 'none' | 'search';
+  handleReset?: () => void;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -18,6 +21,7 @@ export const Input: React.FC<InputProps> = ({
   error,
   className,
   prefix = 'none',
+  handleReset,
   ...props
 }) => {
   const inputClass = clsx('input-field', {
@@ -38,6 +42,11 @@ export const Input: React.FC<InputProps> = ({
           />
         )}
         <input className={inputClass} {...props} />
+        {handleReset && (
+          <button type="button" onClick={handleReset} className="input-suffix">
+            <RecIcon icon={CiCircleRemove} color={getCssVar('--color-text-secondary')} size={24} />
+          </button>
+        )}
       </div>
       {error && <span className="input-error-message">{error}</span>}
     </div>

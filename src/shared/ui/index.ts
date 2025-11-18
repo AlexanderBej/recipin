@@ -11,5 +11,5 @@ export * from './info-popover';
 export * from './modal';
 export * from './star-rating';
 export * from './select';
-export * from './spinners';
+export * from './spinner';
 export * from './textarea';

@@ -23,6 +23,7 @@ import { GiKetchup } from 'react-icons/gi';
 import { GiCoolSpices } from 'react-icons/gi';
 
 import { RatingCategory, RecipeCategory, TagCategory } from '@api/types';
+import { TagDef } from '@api/models';
 
 export const CATEGORY_META: Record<
   RecipeCategory,
@@ -56,43 +57,76 @@ export const CATEGORY_META: Record<
   },
 };
 
-export const TAGS = {
+export const TAGS: Record<TagCategory, TagDef[]> = {
   cuisine: [
-    'Indian',
-    'Italian',
-    'Middle Eastern',
-    'Mexican',
-    'Thai',
-    'Japanese',
-    'Greek',
-    'French',
-    'American',
-    'Korean',
-    'Spanish',
-    'Mediterranean',
+    { id: 'indian', label: 'Indian' },
+    { id: 'italian', label: 'Italian' },
+    { id: 'middle-eastern', label: 'Middle Eastern' },
+    { id: 'mexican', label: 'Mexican' },
+    { id: 'thai', label: 'Thai' },
+    { id: 'asian', label: 'Asian' },
+    { id: 'japanese', label: 'Japanese' },
+    { id: 'greek', label: 'Greek' },
+    { id: 'french', label: 'French' },
+    { id: 'american', label: 'American' },
+    { id: 'korean', label: 'Korean' },
+    { id: 'spanish', label: 'Spanish' },
+    { id: 'mediterranean', label: 'Mediterranean' },
+    { id: 'romanian', label: 'Romanian' },
+    { id: 'cuban', label: 'Cuban' },
+    { id: 'russian', label: 'Russian' },
+    { id: 'indonesian', label: 'Indonesian' },
+    { id: 'north-african', label: 'North African' },
   ],
   dietary: [
-    'Vegan',
-    'Vegetarian',
-    'Gluten-Free',
-    'Dairy-Free',
-    'Keto',
-    'Low-Carb',
-    'Paleo',
-    'Nut-Free',
+    { id: 'vegan', label: 'Vegan' },
+    { id: 'vegetarian', label: 'Vegetarian' },
+    { id: 'gluten-free', label: 'Gluten Free' },
+    { id: 'dairy-free', label: 'Dairy Free' },
+    { id: 'keto', label: 'Keto' },
+    { id: 'salad', label: 'Salad' },
+    { id: 'low-carb', label: 'Low Carb' },
+    { id: 'paleo', label: 'Paleo' },
+    { id: 'nut-free', label: 'Nut Free' },
+    { id: 'protein', label: 'Protein' },
   ],
-  method: ['Baked', 'Fried', 'Grilled', 'Steamed', 'Raw', 'Roasted', 'Air Fryer', 'Slow Cooker'],
+  method: [
+    { id: 'baked', label: 'Baked' },
+    { id: 'fried', label: 'Fried' },
+    { id: 'grilled', label: 'Grilled' },
+    { id: 'steamed', label: 'Steamed' },
+    { id: 'raw', label: 'Raw' },
+    { id: 'roasted', label: 'Roasted' },
+    { id: 'air-fryer', label: 'Air Fryer' },
+    { id: 'slow-cooker', label: 'Slow Cooker' },
+    { id: 'home-made', label: 'Home Made' },
+  ],
   occasion: [
-    'Breakfast',
-    'Brunch',
-    'Dinner Party',
-    'Holiday',
-    'Quick Meal',
-    'Meal Prep',
-    'Kids Friendly',
+    { id: 'breakfast', label: 'Breakfast' },
+    { id: 'brunch', label: 'Brunch' },
+    { id: 'lunch', label: 'Lunch' },
+    { id: 'quick-meal', label: 'Quick Meal' },
+    { id: 'comfort-food', label: 'Comfort Food' },
+    { id: 'dinner', label: 'Dinner' },
+    { id: 'dinner-party', label: 'Dinner Party' },
+    { id: 'holiday', label: 'Holiday' },
+    { id: 'meal-prep', label: 'Meal Prep' },
+    { id: 'kids-friendly', label: 'Kids Friendly' },
   ],
-  time: ['15-Minute', '30-Minute', 'One-Pot'],
-} satisfies Record<TagCategory, readonly string[]>;
+  time: [
+    { id: '15-minute', label: '15 Minute' },
+    { id: '30-minute', label: '30 Minute' },
+    { id: '1-hour', label: '1 Hour' },
+    { id: 'one-pot', label: 'One Pot' },
+  ],
+
+  specific: [
+    { id: 'coconut', label: 'Coconut' },
+    { id: 'tostones', label: 'Tostones' },
+    { id: 'potatoes', label: 'Potatoes' },
+    { id: 'garlic', label: 'Garlic' },
+  ],
+};
 
 export const MAIN_TAGS = ['Italian', 'Low-Carb', '30-Minute', 'Air Fryer'];
 

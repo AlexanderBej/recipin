@@ -20,8 +20,6 @@ const RatingsSheet: React.FC<RatingsSheetProps> = ({ recipeId, ratingCategories 
 
   const total = getRatingAverage(ratingCategories);
 
-  console.log('rating', ratingCategories, total);
-
   const handleRatingSave = (cat: RatingCategory, value: number) => {
     dispatch(saveSoloRatingThunk({ recipeId, cat, value }));
   };

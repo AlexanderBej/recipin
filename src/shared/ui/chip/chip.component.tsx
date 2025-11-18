@@ -1,6 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 
+import { displayTag } from '@shared/utils';
+
 import './chip.styles.scss';
 
 export interface ChipProps {
@@ -18,7 +20,7 @@ export const Chip: React.FC<ChipProps> = ({ tag, active = false, className, onTo
       aria-pressed={active}
       onClick={() => onToggle(tag)}
     >
-      {tag}
+      {displayTag(tag)}
     </button>
   );
 };

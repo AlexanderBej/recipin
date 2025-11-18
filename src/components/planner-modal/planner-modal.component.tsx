@@ -70,10 +70,6 @@ const PlannerModal: React.FC<ConfirmationModalProps> = ({ recipe }) => {
 
     setSubmitting(true);
     try {
-      console.log('period:', period);
-      console.log('selectedDate:', selectedDateISO);
-      console.log('recipe:', recipe);
-
       const planItem: Omit<PlanItem, 'id'> = {
         date: selectedDateISO,
         meal: selectedMeal,

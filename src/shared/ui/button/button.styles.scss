@@ -47,8 +47,15 @@
     margin-top: 50px;
   }
 
+  &__neutral {
+    background-color: unset;
+    border: unset;
+    color: $color-primary-dark;
+  }
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    color: $color-text-secondary;
   }
 }

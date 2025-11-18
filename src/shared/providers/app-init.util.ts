@@ -17,7 +17,7 @@ export const initApp = (dispatch: AppDispatch) => {
     // clear list on every auth change
     dispatch(resetMine());
     dispatch(startBootLoading());
-    console.log(fbUser?.uid);
+    console.log(fbUser);
 
     dispatch(fetchMyRecipeCardsPage({ uid: fbUser?.uid ?? '' }));
     dispatch(fetchMyFavorites(fbUser?.uid ?? ''));

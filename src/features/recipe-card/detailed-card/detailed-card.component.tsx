@@ -1,25 +1,19 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router';
 
 import { RecipeCard as RecipeCardModel } from '@api/models';
 import { CATEGORY_META } from '@api/misc';
 import { Chip, Favorite, RecIcon } from '@shared/ui';
-import { AppDispatch, RecipeDifficulty } from '@api/types';
+import { RecipeDifficulty } from '@api/types';
 import { getCssVar, toDateOrNull } from '@shared/utils';
-import { fetchRecipeById } from '@store/recipes-store';
 import { RecipeImg } from '@components';
 
-import './recipe-card.styles.scss';
+import './detailed-card.styles.scss';
 interface RecipeCardProps {
   recipe: RecipeCardModel;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-
+const DetailedCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const getDifColor = (dif: RecipeDifficulty | undefined): string => {
     return dif === 'easy'
       ? getCssVar('--color-success')
@@ -28,17 +22,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         : getCssVar('--color-error');
   };
 
-  const handleRecipeTap = () => {
-    console.log('get here');
-
-    dispatch(fetchRecipeById(recipe.id));
-    navigate(`/recipe/${recipe.id}`);
-  };
-
   const updatedAtDate = toDateOrNull(recipe.updatedAt);
 
   return (
-    <div className="recipe-card" onClick={handleRecipeTap}>
+    <>
       <Favorite
         isFavorite={recipe?.isFavorite ?? false}
         recipeId={recipe?.id ?? ''}
@@ -46,12 +33,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
       />
 
       <RecipeImg src={recipe.imageUrl} alt={recipe.title} variant="square" />
-      <div className="recipe-details">
-        <div className="details-container">
-          <h4 className="recipe-title">{recipe.title}</h4>
+      <div className="det-card-details">
+        <div>
+          <h4 className="det-card-recipe-title">{recipe.title}</h4>
 
           <div
-            className="category-box"
+            className="det-card-category-box"
             style={{
               backgroundColor: `${CATEGORY_META[recipe.category].color}99`,
               borderColor: CATEGORY_META[recipe.category].color,
@@ -61,19 +48,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <span>{CATEGORY_META[recipe.category].label}</span>
           </div>
           <p className="truncate-p">{recipe.excerpt}</p>
-          <div className="row">
+          <div className="det-card-row">
             <span style={{ color: getDifColor(recipe.difficulty) }}>{recipe.difficulty}</span>
             <span>{updatedAtDate ? format(updatedAtDate, 'MMM, yyyy') : '—'}</span>
           </div>
         </div>
-        <div className="tags-container">
+        <div className="det-card-tags-container">
           {recipe.tags.map((tag) => (
             <Chip key={tag} tag={tag} onToggle={() => {}} active className="card-tag" />
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default RecipeCard;
+export default DetailedCard;

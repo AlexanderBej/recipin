@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import { PageSpinner } from '@shared/ui';
+import { Spinner } from '@shared/ui';
 import { BottomTabBar, TopTitleBar } from '@components';
 import { selectAppBootState } from '@store/index';
 
@@ -14,7 +14,7 @@ const Layout: React.FC = () => {
   return (
     <div className="main-layout">
       {booting ? (
-        <PageSpinner />
+        <Spinner type="page" />
       ) : (
         <>
           <TopTitleBar />
