@@ -9,7 +9,7 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import storage from 'redux-persist/es/storage';
 
 import authReducer from './auth-store/auth.slice';
 import recipesReducer from './recipes-store/recipes.slice';

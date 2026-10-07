@@ -13,19 +13,16 @@ import {
 export const initApp = (dispatch: AppDispatch) => {
   dispatch(setAuthLoading());
 
-  const unsubAuth = onAuthStateChanged(auth, async (fbUser) => {
+  const unsubAuth = onAuthStateChanged(auth, (fbUser) => {
     // clear list on every auth change
     dispatch(resetMine());
-    dispatch(startBootLoading());
-    console.log(fbUser);
-
-    dispatch(fetchMyRecipeCardsPage({ uid: fbUser?.uid ?? '' }));
-    dispatch(fetchMyFavorites(fbUser?.uid ?? ''));
-
-    if (!fbUser) {
+    if (!fbUser?.uid) {
       dispatch(userSignedOut());
       return;
     }
+    dispatch(startBootLoading());
+    dispatch(fetchMyRecipeCardsPage({ uid: fbUser.uid }));
+    dispatch(fetchMyFavorites(fbUser.uid));
     dispatch(
       userSignedIn({
         uid: fbUser.uid,

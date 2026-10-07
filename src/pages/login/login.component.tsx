@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { ensureUserProfile, signInWithGoogle } from '@api/services';
 import { Button, RecIcon } from '@shared/ui';
 import { selectAuthStatus } from '@store/auth-store';
-import { ReactComponent as Logo } from '../../assets/logo.svg';
+import logo from '../../assets/logo.svg';
 
 import './login.styles.scss';
 
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-page">
-      <Logo className="logo" height={180} />
+      <img src={logo} alt="Recipin" className="logo" height={180} />
       <div className="login-container">
         <h2>Login</h2>
         <hr></hr>

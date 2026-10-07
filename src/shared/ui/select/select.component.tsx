@@ -21,10 +21,8 @@ interface SelectProps {
   errors?: string;
   customClassName?: string;
   small?: boolean;
-  // eslint-disable-next-line , no-unused-vars
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   // Allow additional props (e.g., className, id)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 

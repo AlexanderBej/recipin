@@ -1,46 +1,50 @@
-# Getting Started with Create React App
+# Recipin
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React application built with Vite. Use Node 22.13+ on the Node 22 release line,
+Node 24, or Node 26+, then install the locked dependencies with `npm ci`.
 
-## Available Scripts
+## Local configuration
 
-In the project directory, you can run:
+Set the Firebase values listed in `.env.example` in `.env.local`. Vite exposes
+`VITE_*` variables to the browser at build time; never put server credentials in them.
+Keep the existing Firebase project, auth domain, and application values.
+The storage bucket variable remains unused; image uploads are not enabled.
 
-### `npm start`
+## Commands
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- `npm start` or `npm run dev`: development server, normally http://localhost:5173.
+- `npm run typecheck`: TypeScript verification without emitting files.
+- `npm test`: run all smoke tests once.
+- `npm run test:watch`: watch smoke tests while editing.
+- `npm run lint`: check TypeScript, React, and Hooks with ESLint's flat configuration.
+- `npm run build`: typecheck and create the production app in `dist`.
+- `npm run preview`: serve the production build, normally http://localhost:4173.
+- `npm run format`: format source files with Prettier.
+- `npm run format:check`: check repository formatting without modifying files.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The tests cover protected routes, authenticated initialization, and grocery persistence using mocked Firebase
+boundaries. Google popup login and real Firestore operations require manual verification.
+Vite does not run ESLint as part of its build; run `npm run lint` separately.
+Linting uses ESLint 10, typescript-eslint, React-X, and the React Hooks plugin.
+Existing explicit `any` boundary types are allowed, and effect dependencies are warnings;
+formatting remains Prettier's responsibility. TypeScript remains on the 5.9 release line.
+Production uses Vite's default modern-browser target rather than CRA's Browserslist target.
+Grocery item IDs use `crypto.randomUUID()`, so production must use HTTPS (localhost
+development is also supported).
 
-### `npm test`
+## Netlify
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+`netlify.toml` sets `npm run build`, the `dist` publish directory, and Node 22.
+Rename deployment variables from the previous `REACT_APP_` prefix to `VITE_`,
+preserving every value, before deploying. Rebuild after changing environment variables.
 
-### `npm run build`
+`public/_redirects` is copied to `dist/_redirects` and sends SPA deep links such as
+`/recipe/:id` to `index.html`. Other static hosts need an equivalent fallback.
+The app assumes deployment at the domain root. Preview is for local verification,
+not a production server.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Verify Firebase's authorized domains if deploying to a new hostname. Retain the
+production origin to preserve browser-local groceries and authentication persistence.
+The existing manifest and icons are preserved; no service worker or offline caching
+is configured. Direct recipe URLs reach the app, but the existing detail page's
+dependency on previously loaded Redux data is unchanged.

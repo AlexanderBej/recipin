@@ -10,7 +10,6 @@ import {
   selectRecipesFavorites,
   selectRecipesLastFilters,
   selectRecipesLoading,
-  startOptimisticLoading,
 } from '@store/recipes-store';
 import { AppDispatch } from '@api/types';
 import { selectAuthUserId } from '@store/auth-store';
@@ -60,13 +59,15 @@ const Library: React.FC = () => {
 
     console.log('filters', recFilters);
 
-    dispatch(startOptimisticLoading());
     lastSearchRef.current = searchTerm;
     lastTagsKeyRef.current = tag;
     lastCategoryKeyRef.current = category;
     lastDifficultyKeyRef.current = difficulty;
+    console.log('optimistic');
 
     const handler = setTimeout(() => {
+      console.log('handler');
+
       dispatch(
         fetchMyRecipeCardsPage({
           uid,

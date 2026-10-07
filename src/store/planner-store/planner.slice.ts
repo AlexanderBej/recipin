@@ -69,7 +69,7 @@ export const loadPlannerWindowForAnchor = createAppAsyncThunk<
 export const removePlanItemThunk = createAppAsyncThunk<
   { date: string; id: string },
   { planItemId: string; date: string }
->('planner/removePlanItem', async ({ planItemId, date }, { dispatch, rejectWithValue }) => {
+>('planner/removePlanItem', async ({ planItemId, date }, { rejectWithValue }) => {
   try {
     await removePlanItemFromDb(planItemId);
 
@@ -82,7 +82,7 @@ export const removePlanItemThunk = createAppAsyncThunk<
 export const addPlanItemThunk = createAppAsyncThunk<
   PlanItem,
   { uid: string; item: Omit<PlanItem, 'id'> }
->('planner/addPlanItem', async ({ uid, item }, { dispatch, rejectWithValue }) => {
+>('planner/addPlanItem', async ({ uid, item }, { rejectWithValue }) => {
   try {
     const res = await addPlanItem(uid, item);
     return res;
