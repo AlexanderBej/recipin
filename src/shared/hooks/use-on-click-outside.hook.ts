@@ -1,6 +1,5 @@
 import { RefObject, useEffect } from 'react';
 
-// eslint-disable-next-line no-unused-vars
 type Handler = (event: MouseEvent | TouchEvent) => void;
 
 /**

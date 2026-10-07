@@ -4,7 +4,7 @@ import { StepProps } from '../create-recipe.misc';
 
 import './media-review.styles.scss';
 
-const MediaReview: React.FC<StepProps> = ({ formData, handleChange }) => {
+const MediaReview: React.FC<StepProps> = ({ formData }) => {
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border p-4">

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router';
-import { v4 as uuidv4 } from 'uuid';
 import { FaPlus } from 'react-icons/fa';
 import { FaMinus } from 'react-icons/fa';
 import { FaRegClock } from 'react-icons/fa';
@@ -46,7 +45,7 @@ const RecipeDetails: React.FC = () => {
     if (recipe) {
       const groceryItems: GroceryItem[] = recipe?.ingredients.map((rec) => {
         return {
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           name: rec.item,
           quantity: rec.quantity,
           unit: rec.unit,

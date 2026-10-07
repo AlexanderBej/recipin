@@ -1,4 +1,4 @@
-import { RatingCategory, RecipeCategory, RecipeDifficulty, TagCategory } from '@api/types';
+import { RatingCategory, RecipeCategory, RecipeDifficulty } from '@api/types';
 
 export interface RecipeCard {
   id: string;
