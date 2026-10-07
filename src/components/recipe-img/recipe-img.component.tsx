@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
+import placeholderImage from '../../assets/img_placeholder.png';
 
 import './recipe-img.styles.scss';
-const placeholderImage = require('../../assets/img_placeholder.png');
 
 type RecipeImageVariant = 'card' | 'detail' | 'thumb' | 'square' | 'landscape';
 

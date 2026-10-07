@@ -62,8 +62,9 @@ export const fetchMyRecipeCardsPage = createAppAsyncThunk<
   FetchMyRecipeCardsPageArgs
 >(
   'recipes/fetchMinePage',
-  async ({ uid, pageSize, reset = false, filters }, { getState, rejectWithValue }) => {
+  async ({ uid, pageSize, reset = false, filters }, { getState, dispatch, rejectWithValue }) => {
     try {
+      dispatch(startOptimisticLoading());
       const state = getState() as RootState;
       const mine = state.recipes.mine; // adjust path if different
 
@@ -78,6 +79,7 @@ export const fetchMyRecipeCardsPage = createAppAsyncThunk<
         startAfterCreatedAt: reset || hasSearch ? null : mine.nextStartAfterCreatedAt,
         startAfterTitle: reset || !hasSearch ? null : mine.nextStartAfterTitle,
       };
+      console.log('call API');
 
       const res = await listRecipeCardsByOwnerPaged(uid, payload);
 

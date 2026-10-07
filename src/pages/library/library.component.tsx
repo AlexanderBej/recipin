@@ -60,13 +60,16 @@ const Library: React.FC = () => {
 
     console.log('filters', recFilters);
 
-    dispatch(startOptimisticLoading());
+    // dispatch(startOptimisticLoading());
     lastSearchRef.current = searchTerm;
     lastTagsKeyRef.current = tag;
     lastCategoryKeyRef.current = category;
     lastDifficultyKeyRef.current = difficulty;
+    console.log('optimistic');
 
     const handler = setTimeout(() => {
+      console.log('handler');
+
       dispatch(
         fetchMyRecipeCardsPage({
           uid,
