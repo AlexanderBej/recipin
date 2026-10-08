@@ -10,8 +10,35 @@ import {
   FiCompass,
 } from 'react-icons/fi';
 import './food-hub-header.styles.scss';
+import { useRestaurants } from '../../features/restaurants/restaurants.provider';
 
-export default function FoodHubHeader({ world }: { world: 'hub' | 'recipes' }) {
+function RestaurantNavigation() {
+  const { quickAdd } = useRestaurants();
+  return (
+    <div className="hub-recipe-bar hub-restaurant-bar">
+      <nav aria-label="Restaurant tools">
+        <NavLink to="/restaurants" end>
+          <FiCompass aria-hidden="true" />
+          <span>Discover</span>
+        </NavLink>
+        <NavLink to="/restaurants/library">
+          <FiBookOpen aria-hidden="true" />
+          <span>Library</span>
+        </NavLink>
+      </nav>
+      <button
+        className="hub-icon-link"
+        onClick={quickAdd}
+        aria-label="Quick Add restaurant"
+        title="Quick Add"
+      >
+        <FiPlus aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
+export default function FoodHubHeader({ world }: { world: 'hub' | 'recipes' | 'restaurants' }) {
   const navigate = useNavigate();
   return (
     <header className="hub-header">
@@ -23,14 +50,12 @@ export default function FoodHubHeader({ world }: { world: 'hub' | 'recipes' }) {
           <FiGrid aria-hidden="true" />
           <select
             aria-label="World"
-            value={world === 'recipes' ? '/recipes' : '/'}
+            value={world === 'hub' ? '/' : `/${world}`}
             onChange={(event) => navigate(event.target.value)}
           >
             <option value="/">Food Hub</option>
             <option value="/recipes">Recipes</option>
-            <option value="restaurants" disabled>
-              Restaurants (coming soon)
-            </option>
+            <option value="/restaurants">Restaurants</option>
           </select>
           <FiChevronDown className="hub-world-selector__chevron" aria-hidden="true" />
         </label>
@@ -68,6 +93,7 @@ export default function FoodHubHeader({ world }: { world: 'hub' | 'recipes' }) {
           </Link>
         </div>
       )}
+      {world === 'restaurants' && <RestaurantNavigation />}
     </header>
   );
 }

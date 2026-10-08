@@ -13,6 +13,10 @@ import authReducer, {
 } from './store/auth-store/auth.slice';
 
 vi.mock('@shared/providers', () => ({ initApp: () => vi.fn() }));
+vi.mock('./features/restaurants/restaurants.provider', () => ({
+  default: ({ children }: { children: React.ReactNode }) => children,
+  useRestaurants: () => ({ quickAdd: vi.fn() }),
+}));
 vi.mock('@store/index', () => {
   const ready = { booting: false };
   return { selectAppBootState: () => ready };
@@ -40,6 +44,9 @@ vi.mock('@pages', async () => {
     },
     Library: () => <h1>Recipe library</h1>,
     RecipesDiscovery: () => <h1>Recipes discovery</h1>,
+    RestaurantsDiscovery: () => <h1>Restaurants discovery</h1>,
+    RestaurantsLibrary: () => <h1>Restaurant library</h1>,
+    RestaurantDetail: () => <h1>Restaurant {useParams().id}</h1>,
     RecipeDetails: () => <h1>Recipe {useParams().id}</h1>,
     Cooking: () => <h1>Cooking {useParams().id}</h1>,
     Create: Placeholder,
@@ -109,17 +116,15 @@ test('opens the library for an authenticated user', () => {
   expect(screen.getByRole('heading', { name: 'Recipe library' })).toBeInTheDocument();
 });
 
-test('opens Food Hub at the authenticated root with an inactive Restaurants card', () => {
+test('opens Food Hub with working Recipes and Restaurants entries', () => {
   renderRoute('/', 'authenticated');
   expect(screen.getByRole('heading', { name: 'Food Hub', level: 1 })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Recipes' })).toHaveAttribute('href', '/recipes');
-  expect(screen.getByRole('article', { name: 'Restaurants' })).toHaveAttribute(
-    'aria-disabled',
-    'true',
-  );
-  expect(screen.queryByRole('link', { name: /Restaurants/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Restaurants' })).toHaveAttribute('href', '/restaurants');
   expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/profile');
   expect(screen.queryByRole('navigation', { name: 'Recipe tools' })).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('link', { name: 'Restaurants' }));
+  expect(screen.getByRole('heading', { name: 'Restaurants discovery' })).toBeInTheDocument();
 });
 
 test.each([
@@ -130,6 +135,9 @@ test.each([
   '/grocery',
   '/recipes/new',
   '/recipe/soup/edit',
+  '/restaurants',
+  '/restaurants/library',
+  '/restaurant/cafe',
 ])('protects %s from guest access', (path) => {
   renderRoute(path, 'guest');
   expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument();
@@ -156,7 +164,7 @@ test.each([
 
 test('switches worlds and recipe tools while preserving back and forward navigation', () => {
   renderRoute('/', 'authenticated');
-  expect(screen.getByRole('option', { name: 'Restaurants (coming soon)' })).toBeDisabled();
+  expect(screen.getByRole('option', { name: 'Restaurants' })).toBeEnabled();
   fireEvent.change(screen.getByRole('combobox', { name: 'World' }), {
     target: { value: '/recipes' },
   });
@@ -174,6 +182,35 @@ test('switches worlds and recipe tools while preserving back and forward navigat
   expect(screen.getByRole('heading', { name: 'Grocery content' })).toBeInTheDocument();
   fireEvent.change(screen.getByRole('combobox', { name: 'World' }), { target: { value: '/' } });
   expect(screen.getByRole('heading', { name: 'Food Hub', level: 1 })).toBeInTheDocument();
+});
+
+test('switches to Restaurants, exposes only its contextual tools, and returns to Recipes', () => {
+  renderRoute('/recipes', 'authenticated');
+  fireEvent.change(screen.getByRole('combobox', { name: 'World' }), {
+    target: { value: '/restaurants' },
+  });
+  expect(screen.getByRole('heading', { name: 'Restaurants discovery' })).toBeInTheDocument();
+  expect(screen.getByRole('combobox', { name: 'World' })).toHaveValue('/restaurants');
+  expect(screen.queryByRole('navigation', { name: 'Recipe tools' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: 'Planner' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: 'Groceries' })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Quick Add restaurant' })).toBeInTheDocument();
+  fireEvent.click(
+    within(screen.getByRole('navigation', { name: 'Restaurant tools' })).getByRole('link', {
+      name: 'Library',
+    }),
+  );
+  expect(screen.getByRole('heading', { name: 'Restaurant library' })).toBeInTheDocument();
+  fireEvent.change(screen.getByRole('combobox', { name: 'World' }), {
+    target: { value: '/recipes' },
+  });
+  expect(screen.getByRole('heading', { name: 'Recipes discovery' })).toBeInTheDocument();
+});
+test('direct Restaurant details stay in the Restaurants shell without Recipe tools', () => {
+  renderRoute('/restaurant/cafe', 'authenticated');
+  expect(screen.getByRole('heading', { name: 'Restaurant cafe' })).toBeInTheDocument();
+  expect(screen.getByRole('combobox', { name: 'World' })).toHaveValue('/restaurants');
+  expect(screen.queryByRole('link', { name: 'Planner' })).not.toBeInTheDocument();
 });
 
 test('keeps creation available and redirects the old library alias', () => {

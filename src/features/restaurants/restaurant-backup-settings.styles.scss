@@ -1,0 +1,128 @@
+.restaurant-backup-settings {
+  width: 100%;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #504b43;
+  color: #f4f1e9;
+  overflow-wrap: anywhere;
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  h3 {
+    font-size: 18px;
+  }
+  button,
+  &__actions > label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #292927;
+    color: inherit;
+    border: 1px solid #746348;
+    border-radius: 4px;
+    padding: 10px 14px;
+    cursor: pointer;
+    &:disabled,
+    &.is-disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    svg {
+      flex-shrink: 0;
+    }
+  }
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+    label:focus-within {
+      outline: 2px solid #bb9866;
+    }
+  }
+  &__note,
+  small {
+    color: #bcb9b1;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  &__preview,
+  &__cleanup {
+    border-top: 1px solid #504b43;
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+  &__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid #403d37;
+    > div {
+      flex: 1 1 200px;
+      min-width: 0;
+    }
+    small {
+      display: block;
+      margin: 6px 0 0;
+    }
+    label {
+      display: flex;
+      min-width: 0;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+  }
+  select {
+    min-width: 0;
+    max-width: 100%;
+    background: #292927;
+    color: inherit;
+    border: 1px solid #746348;
+    padding: 8px;
+    border-radius: 4px;
+  }
+  &__confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  input {
+    accent-color: #bb9866;
+  }
+  > p {
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  [role='alert'] {
+    color: #efac9d;
+  }
+  details {
+    margin-top: 20px;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  li {
+    margin: 8px 0;
+  }
+}

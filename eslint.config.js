@@ -32,5 +32,5 @@ export default defineConfig([
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
-  { files: ['*.{js,ts}'], languageOptions: { globals: globals.node } },
+  { files: ['*.{js,ts}', 'netlify/**/*.ts'], languageOptions: { globals: globals.node } },
 ]);

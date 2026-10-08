@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 
 import { selectAuthUser } from '@store/auth-store';
+import RestaurantBackupSettings from '../../features/restaurants/restaurant-backup-settings.component';
 
 import './profile.styles.scss';
 
@@ -27,6 +28,7 @@ const Profile: React.FC = () => {
           </NavLink>
         </div>
       </div>
+      <RestaurantBackupSettings />
     </div>
   );
 };
