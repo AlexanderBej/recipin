@@ -9,6 +9,9 @@ import {
   saveSoloRating,
   toggleRecipeFavorite,
   listFavoriteRecipes,
+  listDiscoveryRecipeCards,
+  updateRecipePair,
+  UpdateRecipeInput,
 } from '@api/services';
 import { createAppAsyncThunk, CreateRecipeInput, RatingCategory, RootState } from '@api/types';
 import { ListRecipeCardsOptions, ListRecipeCardsResult, RecipeCardFilters } from '@api/models';
@@ -26,6 +29,7 @@ type FetchMyRecipeCardsPageArgs = {
 };
 
 type PageMeta = {
+  requestId?: string;
   loading: boolean;
   error?: string | null;
   pageSize: number;
@@ -35,6 +39,19 @@ type PageMeta = {
 };
 
 type RecipesState = {
+  detail: {
+    id: string | null;
+    status: 'idle' | 'loading' | 'ready' | 'not-found' | 'error';
+    requestId?: string;
+    error?: string;
+  };
+  discovery: {
+    items: RecipeCard[];
+    ownerId: string | null;
+    status: 'idle' | 'loading' | 'ready' | 'error';
+    requestId?: string;
+    error?: string;
+  };
   bootLoading: boolean;
   cards: ReturnType<typeof cardsAdapter.getInitialState>;
   favorites: RecipeCard[];
@@ -43,6 +60,8 @@ type RecipesState = {
 };
 
 const initialState: RecipesState = {
+  detail: { id: null, status: 'idle' },
+  discovery: { items: [], ownerId: null, status: 'idle' },
   bootLoading: false,
   cards: cardsAdapter.getInitialState(),
   mine: {
@@ -56,6 +75,19 @@ const initialState: RecipesState = {
   favorites: [],
   currentRecipe: null,
 };
+
+export const fetchDiscoveryRecipes = createAppAsyncThunk<RecipeCard[], string>(
+  'recipes/discovery',
+  async (uid) => listDiscoveryRecipeCards(uid),
+  {
+    condition: (uid, { getState }) => {
+      const { discovery } = getState().recipes;
+      return (
+        !!uid && (discovery.ownerId !== uid || !['loading', 'ready'].includes(discovery.status))
+      );
+    },
+  },
+);
 
 export const fetchMyRecipeCardsPage = createAppAsyncThunk<
   ListRecipeCardsResult,
@@ -103,15 +135,21 @@ export const fetchMyFavorites = createAppAsyncThunk<RecipeCard[], string>(
   },
 );
 
-export const fetchRecipeById = createAsyncThunk(
+export const fetchRecipeById = createAppAsyncThunk<RecipeEntity | null, string>(
   'recipes/fetchRecipeById',
   async (id: string, { rejectWithValue }) => {
     try {
       const res = await getRecipe(id);
       return res;
-    } catch (error) {
-      return rejectWithValue(error);
+    } catch {
+      return rejectWithValue('Could not load this recipe. Please try again.');
     }
+  },
+  {
+    condition: (id, { getState }) => {
+      const { detail, currentRecipe } = getState().recipes;
+      return !!id && !(detail.id === id && detail.status === 'loading') && currentRecipe?.id !== id;
+    },
   },
 );
 
@@ -144,15 +182,33 @@ export const toggleFavorite = createAppAsyncThunk<
 
 export const createRecipe = createAppAsyncThunk<RecipeCard, CreateRecipeInput>(
   'recipes/create',
-  async (data, { rejectWithValue }) => {
+  async (data, { rejectWithValue, getState }) => {
     try {
       const { card } = await addRecipePair(data);
+      if (getState().auth.user?.uid !== data.authorId)
+        return rejectWithValue('Your session changed.');
       return card;
     } catch (error: any) {
       return rejectWithValue(error.message ?? 'Failed to create new recipe');
     }
   },
 );
+
+export const updateRecipe = createAppAsyncThunk<
+  Awaited<ReturnType<typeof updateRecipePair>>,
+  UpdateRecipeInput
+>('recipes/update', async (input, { rejectWithValue, getState }) => {
+  try {
+    const result = await updateRecipePair(input);
+    if (getState().auth.user?.uid !== input.uid) return rejectWithValue('Your session changed.');
+    return result;
+  } catch (error) {
+    return rejectWithValue({
+      conflict: error instanceof Error && error.name === 'RecipeEditConflict',
+      message: error instanceof Error ? error.message : 'Could not save this recipe.',
+    });
+  }
+});
 
 export const removeRecipe = createAppAsyncThunk<string, string>(
   'recipes/remove',
@@ -170,6 +226,9 @@ const recipesSlice = createSlice({
   name: 'recipes',
   initialState,
   reducers: {
+    invalidateDiscovery(state) {
+      state.discovery = { items: [], ownerId: null, status: 'idle' };
+    },
     startBootLoading(state) {
       state.bootLoading = true;
     },
@@ -177,6 +236,9 @@ const recipesSlice = createSlice({
       state.mine.loading = true;
     },
     resetMine(state) {
+      state.currentRecipe = null;
+      state.detail = { id: null, status: 'idle' };
+      state.discovery = { items: [], ownerId: null, status: 'idle' };
       state.mine = {
         loading: false,
         error: null,
@@ -190,11 +252,34 @@ const recipesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchMyRecipeCardsPage.pending, (state) => {
+      .addCase(fetchDiscoveryRecipes.pending, (state, action) => {
+        state.discovery = {
+          items: [],
+          ownerId: action.meta.arg,
+          status: 'loading',
+          requestId: action.meta.requestId,
+        };
+      })
+      .addCase(fetchDiscoveryRecipes.fulfilled, (state, action) => {
+        if (state.discovery.requestId !== action.meta.requestId) return;
+        state.discovery.items = action.payload;
+        state.discovery.status = 'ready';
+        state.discovery.requestId = undefined;
+      })
+      .addCase(fetchDiscoveryRecipes.rejected, (state, action) => {
+        if (state.discovery.requestId !== action.meta.requestId) return;
+        state.discovery.status = 'error';
+        state.discovery.error = action.error.message ?? 'Could not load your collection';
+        state.discovery.requestId = undefined;
+      })
+      .addCase(fetchMyRecipeCardsPage.pending, (state, action) => {
+        state.mine.requestId = action.meta.requestId;
         state.mine.loading = true;
         state.mine.error = null;
       })
       .addCase(fetchMyRecipeCardsPage.fulfilled, (state, action) => {
+        if (state.mine.requestId !== action.meta.requestId) return;
+        state.mine.requestId = undefined;
         // Now you can use meta safely:
         const { reset, filters } = action.meta.arg as FetchMyRecipeCardsPageArgs;
 
@@ -218,6 +303,8 @@ const recipesSlice = createSlice({
         state.bootLoading = false;
       })
       .addCase(fetchMyRecipeCardsPage.rejected, (state, action) => {
+        if (state.mine.requestId !== action.meta.requestId) return;
+        state.mine.requestId = undefined;
         state.mine.loading = false;
         state.bootLoading = false;
         state.mine.error = action.error.message ?? 'Failed to load recipes';
@@ -241,6 +328,7 @@ const recipesSlice = createSlice({
         state.mine.error = null;
       })
       .addCase(createRecipe.fulfilled, (state, action) => {
+        state.discovery = { items: [], ownerId: null, status: 'idle' };
         // optimistic: insert the returned card (timestamps null until refetch)
         cardsAdapter.upsertOne(state.cards, action.payload);
         state.mine.loading = false;
@@ -249,12 +337,29 @@ const recipesSlice = createSlice({
         state.mine.loading = false;
         state.mine.error = action.error.message ?? 'Failed to create new recipe';
       })
+      .addCase(updateRecipe.fulfilled, (state, action) => {
+        const { recipe, card } = action.payload;
+        state.currentRecipe = recipe;
+        state.detail = { id: recipe.id, status: 'ready' };
+        cardsAdapter.upsertOne(state.cards, card);
+        const index = state.favorites.findIndex((item) => item.id === card.id);
+        if (index >= 0) state.favorites[index] = card;
+        state.discovery = { items: [], ownerId: null, status: 'idle' };
+      })
 
       .addCase(removeRecipe.pending, (state) => {
         state.mine.loading = true;
         state.mine.error = null;
       })
       .addCase(removeRecipe.fulfilled, (state, action) => {
+        if (state.currentRecipe?.id === action.payload) {
+          state.currentRecipe = null;
+          state.detail = { id: action.payload, status: 'not-found' };
+        }
+        state.discovery.items = state.discovery.items.filter(
+          (recipe) => recipe.id !== action.payload,
+        );
+        state.favorites = state.favorites.filter((recipe) => recipe.id !== action.payload);
         // optimistic: insert the returned card (timestamps null until refetch)
         cardsAdapter.removeOne(state.cards, action.payload);
         state.mine.loading = false;
@@ -264,17 +369,21 @@ const recipesSlice = createSlice({
         state.mine.error = action.error.message ?? 'Failed to delete recipe';
       })
 
-      .addCase(fetchRecipeById.pending, (state) => {
-        state.mine.loading = true;
-        state.mine.error = null;
+      .addCase(fetchRecipeById.pending, (state, action) => {
+        state.detail = { id: action.meta.arg, status: 'loading', requestId: action.meta.requestId };
       })
       .addCase(fetchRecipeById.fulfilled, (state, action) => {
+        if (state.detail.requestId !== action.meta.requestId) return;
         state.currentRecipe = action.payload;
-        state.mine.loading = false;
+        state.detail = { id: action.meta.arg, status: action.payload ? 'ready' : 'not-found' };
       })
       .addCase(fetchRecipeById.rejected, (state, action) => {
-        state.mine.loading = false;
-        state.mine.error = action.error.message ?? 'Failed to retrieve recipe details';
+        if (state.detail.requestId !== action.meta.requestId) return;
+        state.detail = {
+          id: action.meta.arg,
+          status: 'error',
+          error: String(action.payload ?? 'Could not load this recipe. Please try again.'),
+        };
       })
 
       .addCase(saveSoloRatingThunk.pending, (state) => {
@@ -283,13 +392,18 @@ const recipesSlice = createSlice({
       })
       .addCase(saveSoloRatingThunk.fulfilled, (state, action) => {
         const { id, cat, value } = action.payload;
+        const discoveryCard = state.discovery.items.find((recipe) => recipe.id === id);
+        if (discoveryCard)
+          discoveryCard.ratingCategories = { ...discoveryCard.ratingCategories, [cat]: value };
         const card = state.cards.entities[id];
-        if (!card) return;
-
-        const prev = card.ratingCategories ?? {};
-        card.ratingCategories = { ...prev, [cat]: value };
-        if (state.currentRecipe) state.currentRecipe.ratingCategories = { ...prev, [cat]: value };
-        state.mine.loading = false;
+        if (card) card.ratingCategories = { ...card.ratingCategories, [cat]: value };
+        if (state.currentRecipe?.id === id)
+          state.currentRecipe.ratingCategories = {
+            ...state.currentRecipe.ratingCategories,
+            [cat]: value,
+          };
+        const favorite = state.favorites.find((recipe) => recipe.id === id);
+        if (favorite) favorite.ratingCategories = { ...favorite.ratingCategories, [cat]: value };
       })
       .addCase(saveSoloRatingThunk.rejected, (state, action) => {
         state.mine.loading = false;
@@ -303,18 +417,20 @@ const recipesSlice = createSlice({
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         const { id, fav } = action.payload;
         const card = state.cards.entities[id];
-        if (!card) return;
-
-        card.isFavorite = fav;
-        if (state.currentRecipe) state.currentRecipe.isFavorite = fav;
-
-        if (fav) {
-          state.favorites.push(card);
-        } else {
-          const favorite = state.favorites.find((favor) => favor.id === id);
-          if (favorite) {
-            state.favorites = state.favorites.filter((fav) => fav.id !== id);
-          }
+        const discoveryCard = state.discovery.items.find((recipe) => recipe.id === id);
+        if (card) card.isFavorite = fav;
+        if (discoveryCard) discoveryCard.isFavorite = fav;
+        if (state.currentRecipe?.id === id) state.currentRecipe.isFavorite = fav;
+        const favorite = state.favorites.find((recipe) => recipe.id === id);
+        if (favorite) favorite.isFavorite = fav;
+        const updated =
+          discoveryCard ??
+          card ??
+          (state.currentRecipe?.id === id ? state.currentRecipe : undefined);
+        if (fav && updated && !favorite) {
+          state.favorites.push(updated);
+        } else if (!fav) {
+          state.favorites = state.favorites.filter((recipe) => recipe.id !== id);
         }
       })
       .addCase(toggleFavorite.rejected, (state, action) => {
@@ -323,5 +439,6 @@ const recipesSlice = createSlice({
   },
 });
 
-export const { startBootLoading, startOptimisticLoading, resetMine } = recipesSlice.actions;
+export const { startBootLoading, startOptimisticLoading, resetMine, invalidateDiscovery } =
+  recipesSlice.actions;
 export default recipesSlice.reducer;

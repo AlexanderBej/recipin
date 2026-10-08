@@ -1,0 +1,26 @@
+:root {
+  --hub-bg: #151716;
+  --hub-surface: #222523;
+  --hub-text: #f3f0e8;
+  --hub-muted: #b3b7af;
+  --hub-accent: #c5a573;
+  --hub-line: #373c37;
+  --hub-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --hub-font-display: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --hub-space-2: 8px;
+  --hub-space-3: 12px;
+  --hub-space-4: 16px;
+  --hub-space-6: 24px;
+  --hub-space-8: 32px;
+  --hub-gutter: 32px;
+  --hub-width: 1280px;
+  --hub-content-width: 1040px;
+  --hub-radius: 6px;
+  --hub-motion: 180ms ease;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --hub-gutter: 20px;
+  }
+}

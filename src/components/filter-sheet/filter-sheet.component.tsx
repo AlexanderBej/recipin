@@ -88,7 +88,12 @@ const FilterSheet: React.FC<TagSheetProps> = ({ selected, onChange }) => {
   return (
     <div role="group" aria-label="Recipe tags">
       {/* <div className="tags-header"> */}
-      <button type="button" onClick={() => setOpen(true)} aria-label="Expand to filter">
+      <button
+        className="recipes-action"
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Filters"
+      >
         <RecIcon
           icon={CiFilter}
           size={24}
@@ -99,23 +104,34 @@ const FilterSheet: React.FC<TagSheetProps> = ({ selected, onChange }) => {
               : '--color-text-primary',
           )}
         />
+        Filters
       </button>
       {/* </div> */}
 
       <BottomSheet
+        className="collection-filter-dialog"
         open={open}
         onOpenChange={setOpen}
-        title={
+        title="Filters"
+        headerActions={
           filters.category || filters.difficulty || filters.tag ? (
             <button className="clear-all-btn" type="button" onClick={handleClearFilters}>
               Clear filters
             </button>
-          ) : (
-            'Filters'
-          )
+          ) : null
         }
         size="tall"
         showHandle
+        footer={
+          <Button
+            variant="primary"
+            className="apply-filter-btn"
+            onClick={handleApplyFilters}
+            disabled={!hasChanges}
+          >
+            Apply filters
+          </Button>
+        }
       >
         <div className="filter-sheet">
           <div className="filter-options">
@@ -176,16 +192,6 @@ const FilterSheet: React.FC<TagSheetProps> = ({ selected, onChange }) => {
               );
             })}
             {!expanded.tag && loadMoreButton('tag')}
-          </div>
-          <div className="filter-btn-wrapper">
-            <Button
-              variant="primary"
-              className="apply-filter-btn"
-              onClick={handleApplyFilters}
-              disabled={!hasChanges}
-            >
-              Apply filters
-            </Button>
           </div>
         </div>
       </BottomSheet>

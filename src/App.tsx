@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import ProtectedRoute from './routes/protected-routes';
 import {
   Create,
   Grocery,
+  FoodHub,
   Import,
   Layout,
   Library,
@@ -13,6 +14,8 @@ import {
   Planner,
   Profile,
   RecipeDetails,
+  RecipesDiscovery,
+  Cooking,
 } from '@pages';
 import { initApp } from '@shared/providers';
 import { AppDispatch } from '@store/store';
@@ -36,9 +39,15 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Library />} />
-        <Route path="/create" element={<Create />} />
+        <Route index element={<FoodHub />} />
+        <Route path="/recipes" element={<RecipesDiscovery />} />
+        <Route path="/recipes/library" element={<Library />} />
+        <Route path="/library" element={<Navigate to="/recipes/library" replace />} />
+        <Route path="/create" element={<Navigate to="/recipes/new" replace />} />
+        <Route path="/recipes/new" element={<Create />} />
+        <Route path="/recipe/:id/edit" element={<Create />} />
         <Route path="/recipe/:id" element={<RecipeDetails />} />
+        <Route path="/recipe/:id/cook" element={<Cooking />} />
         <Route path="/grocery" element={<Grocery />} />
         <Route path="/planner" element={<Planner />} />
         <Route path="/profile" element={<Profile />} />

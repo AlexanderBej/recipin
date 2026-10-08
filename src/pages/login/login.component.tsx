@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useSelector } from 'react-redux';
 
@@ -13,12 +13,21 @@ import './login.styles.scss';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const userStatus = useSelector(selectAuthStatus);
+  const { state } = useLocation();
+  const from = state?.from;
+  const destination =
+    typeof from?.pathname === 'string' &&
+    from.pathname.startsWith('/') &&
+    !from.pathname.startsWith('//') &&
+    from.pathname !== '/login'
+      ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`
+      : '/';
 
   useEffect(() => {
     if (userStatus === 'authenticated') {
-      navigate('/');
+      navigate(destination, { replace: true });
     }
-  });
+  }, [userStatus, destination, navigate]);
 
   const logGoogleUser = async () => {
     const user = await signInWithGoogle();

@@ -4,7 +4,7 @@ export function useClipboard() {
   const [copied, setCopied] = useState(false);
 
   const copy = useCallback(async (text: string) => {
-    if (!text) return;
+    if (!text) return false;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -17,12 +17,18 @@ export function useClipboard() {
       document.body.appendChild(textarea);
       textarea.focus();
       textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
+      try {
+        if (!document.execCommand('copy')) return false;
+      } catch {
+        return false;
+      } finally {
+        document.body.removeChild(textarea);
+      }
     }
 
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1200);
+    return true;
   }, []);
 
   return { copy, copied };

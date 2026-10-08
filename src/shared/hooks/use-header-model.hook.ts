@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from 'react';
-import { useLocation, matchRoutes } from 'react-router';
+import { useLocation, matchRoutes } from 'react-router-dom';
 import { NAV_ITEMS } from '../../routes/routes';
 
 export function useHeaderModel() {
@@ -24,7 +24,7 @@ export function useHeaderModel() {
   const params = useMemo<Record<string, string>>(() => (match?.params as any) || {}, [match]);
 
   const resolvedTitle = useMemo(() => {
-    if (!meta) return 'Recipin'; // global fallback
+    if (!meta) return 'Food Hub'; // global fallback
     const t = meta.title;
     return typeof t === 'function' ? t({ params, query }) : t;
   }, [meta, params, query]);
@@ -45,7 +45,7 @@ export function useHeaderModel() {
 
   const docTitle = useMemo(() => {
     const base = resolvedTitle;
-    const format = meta?.documentTitle || ((t: string) => `${t} • Recipin`);
+    const format = meta?.documentTitle || ((t: string) => `${t} • Food Hub`);
     return format(base);
   }, [meta, resolvedTitle]);
 
@@ -58,6 +58,7 @@ export function useHeaderModel() {
     title: resolvedTitle,
     showBack: meta?.showBack,
     actions: meta?.actions,
+    world: meta?.world ?? 'hub',
     // goBack: () => navigate(-1),
   } as const;
 }

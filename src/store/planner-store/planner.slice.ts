@@ -30,22 +30,13 @@ export const initializePlanner = createAppAsyncThunk<string, string>(
   async (uid, { rejectWithValue, dispatch, getState }) => {
     try {
       const state: RootState = getState();
-      const existingAnchorISO = state.planner.anchorWeekStart;
-      let anchorDate: Date;
-
-      if (existingAnchorISO) {
-        anchorDate = new Date(existingAnchorISO);
-      } else {
-        // 1 = Monday; adjust if your getWeekStart uses a different convention
-        const currentWeekStart = getWeekStart(new Date(), 1);
-        anchorDate = currentWeekStart;
-        dispatch(setAnchorWeekStart(currentWeekStart.toISOString()));
-      }
-
-      await dispatch(loadPlannerWindowForAnchor({ uid, anchorDate }));
+      const anchorDate = getWeekStart(new Date(), 1);
+      if (state.planner.anchorWeekStart !== anchorDate.toISOString())
+        dispatch(setAnchorWeekStart(anchorDate.toISOString()));
+      await dispatch(loadPlannerWindowForAnchor({ uid, anchorDate })).unwrap();
       return '';
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(error instanceof Error ? error.message : 'Could not load Planner.');
     }
   },
 );
@@ -62,7 +53,7 @@ export const loadPlannerWindowForAnchor = createAppAsyncThunk<
 
     return byDate;
   } catch (error) {
-    return rejectWithValue(error);
+    return rejectWithValue(error instanceof Error ? error.message : 'Could not load Planner.');
   }
 });
 
@@ -75,7 +66,9 @@ export const removePlanItemThunk = createAppAsyncThunk<
 
     return { date, id: planItemId };
   } catch (error) {
-    return rejectWithValue(error);
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Could not remove the planned recipe.',
+    );
   }
 });
 
@@ -87,7 +80,9 @@ export const addPlanItemThunk = createAppAsyncThunk<
     const res = await addPlanItem(uid, item);
     return res;
   } catch (error) {
-    return rejectWithValue(error);
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Could not add the planned recipe.',
+    );
   }
 });
 
@@ -137,7 +132,9 @@ const plannerSlice = createSlice({
       )
       .addCase(loadPlannerWindowForAnchor.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? 'Failed to load planned items';
+        state.error = String(
+          action.payload ?? action.error.message ?? 'Failed to load planned items',
+        );
       })
 
       .addCase(addPlanItemThunk.pending, (state) => {
@@ -152,7 +149,9 @@ const plannerSlice = createSlice({
       })
       .addCase(addPlanItemThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? 'Failed to load planned items';
+        state.error = String(
+          action.payload ?? action.error.message ?? 'Failed to load planned items',
+        );
       })
 
       .addCase(removePlanItemThunk.pending, (state) => {
@@ -163,6 +162,7 @@ const plannerSlice = createSlice({
         removePlanItemThunk.fulfilled,
         (state, action: PayloadAction<{ id: string; date: string }>) => {
           const { date, id } = action.payload;
+          state.loading = false;
           const list = state.byDate[date];
           if (!list) return;
 
@@ -177,7 +177,9 @@ const plannerSlice = createSlice({
       )
       .addCase(removePlanItemThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? 'Failed to remove plan item';
+        state.error = String(
+          action.payload ?? action.error.message ?? 'Failed to remove plan item',
+        );
       });
   },
 });

@@ -1,104 +1,118 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { FaPlus } from 'react-icons/fa';
-import { GoPlusCircle } from 'react-icons/go';
-
-import { BottomSheet, Input, RecIcon } from '@shared/ui';
-import { getCssVar } from '@shared/utils';
-import { RecipeCard } from '@api/models';
+import { FiPlus, FiSearch } from 'react-icons/fi';
+import { BottomSheet } from '@shared/ui';
+import type { RecipeCard } from '@api/models';
+import type { RecipeCategory } from '@api/types';
 import { listRecipeCardsByOwnerPaged } from '@api/services';
 import { selectAuthUserId } from '@store/auth-store';
-import { RecipeCategory } from '@api/types';
-import { RecipeImg } from '@components';
-
+import RecipePhoto from '../../features/recipe-card/recipe-photo.component';
+import { recipeTitle } from '../../features/recipe-card/collection.utils';
 import './search-sheet.styles.scss';
 
-interface SearchSheetProps {
-  selectedMealCategory: RecipeCategory;
-  onRecipeTap: (rec: RecipeCard) => void;
-  isMainMeal?: boolean;
-}
-
-const SearchSheet: React.FC<SearchSheetProps> = ({
+export default function SearchSheet({
   selectedMealCategory,
   onRecipeTap,
-  isMainMeal = true,
-}) => {
+  disabled = false,
+}: {
+  selectedMealCategory: RecipeCategory;
+  onRecipeTap: (recipe: RecipeCard) => Promise<unknown> | unknown;
+  disabled?: boolean;
+}) {
   const uid = useSelector(selectAuthUserId);
-
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const [recipes, setRecipes] = useState<RecipeCard[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null); // titleSearch cursor
-  const [searchTerm, setSearchTerm] = useState('');
-
-  async function loadPlannerRecipes(initial = false) {
-    if (!uid) return;
-    const { items, nextStartAfterTitle } = await listRecipeCardsByOwnerPaged(uid, {
-      pageSize: 24,
-      startAfterTitle: initial ? null : cursor,
-      filters: {
-        // category: selectedMealCategory, // 'breakfast' / 'lunch' / ...
-        searchTerm, // works both with '' (browse-by-title) and non-empty
-      },
-    });
-
-    setRecipes((prev) => (initial ? items : [...prev, ...items]));
-    setCursor(nextStartAfterTitle);
-  }
-
-  // on open
+  const [loading, setLoading] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    loadPlannerRecipes(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMealCategory, searchTerm, uid]);
-
+    if (!open || !uid) return;
+    let active = true;
+    setLoading(true);
+    setError('');
+    setRecipes([]);
+    listRecipeCardsByOwnerPaged(uid, { pageSize: 24, filters: { searchTerm: search } })
+      .then((result) => {
+        if (active) setRecipes(result.items);
+      })
+      .catch(() => {
+        if (active) setError('Could not load recipes. Try again.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [open, uid, search, attempt]);
+  const add = async (recipe: RecipeCard) => {
+    setAdding(true);
+    setError('');
+    try {
+      await onRecipeTap(recipe);
+      setOpen(false);
+    } catch {
+      setError('Could not add this recipe. Try again.');
+    } finally {
+      setAdding(false);
+    }
+  };
   return (
-    <div className="search-sheet" role="group" aria-label="Search recipe">
-      <BottomSheet
-        trigger={
-          <button type="button" aria-label="Open search recipe sheet">
-            <RecIcon
-              icon={isMainMeal ? FaPlus : GoPlusCircle}
-              size={32}
-              color={getCssVar(isMainMeal ? '--color-primary' : '--color-text-primary')}
-            />
-          </button>
-        }
-        title="Search recipe"
-        size="tall"
-        showHandle
-      >
-        <div className="search-recipe-container">
-          <Input
-            className="search-input"
-            placeholder="Search by title"
-            name="search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            prefix="search"
-          />
-
-          <div className="search-results">
-            {recipes &&
-              recipes.map((rec) => (
-                <button
-                  key={rec.id}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onRecipeTap(rec);
-                  }}
-                  className="recipe-row"
-                >
-                  <RecipeImg src={rec.imageUrl} alt={rec.title} variant="thumb" />
-                  <h3>{rec.title}</h3>
-                </button>
-              ))}
-          </div>
+    <BottomSheet
+      title={`Add to ${selectedMealCategory}`}
+      className="planner-search-sheet recipes-page"
+      open={open}
+      onOpenChange={(value) => {
+        if (!adding) setOpen(value);
+      }}
+      nonDismissable={adding}
+      showClose={!adding}
+      trigger={
+        <button className="planner-add-recipe" disabled={disabled} type="button">
+          <FiPlus />
+          Add to {selectedMealCategory}
+        </button>
+      }
+    >
+      <label className="planner-search-input">
+        <FiSearch aria-hidden="true" />
+        <input
+          aria-label="Search by title"
+          value={search}
+          placeholder="Search by title"
+          disabled={adding}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      </label>
+      {loading && <p role="status">Loading recipes…</p>}
+      {error && (
+        <div role="alert">
+          <p>{error}</p>
+          {!recipes.length && (
+            <button className="recipes-action" onClick={() => setAttempt((value) => value + 1)}>
+              Try again
+            </button>
+          )}
         </div>
-      </BottomSheet>
-    </div>
+      )}
+      {!loading && !error && !recipes.length && <p>No recipes found.</p>}
+      <div className="planner-search-results">
+        {recipes.map((recipe) => (
+          <button
+            key={recipe.id}
+            aria-label={recipeTitle(recipe)}
+            disabled={adding || disabled}
+            onClick={() => add(recipe)}
+          >
+            <RecipePhoto src={recipe.imageUrl} title={recipeTitle(recipe)} />
+            <span>{recipeTitle(recipe)}</span>
+            <FiPlus aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+      {adding && <p role="status">Adding recipe…</p>}
+    </BottomSheet>
   );
-};
-
-export default SearchSheet;
+}

@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FaRegCalendarPlus } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, Modal, RecIcon } from '@shared/ui';
+import { BottomSheet, RecIcon } from '@shared/ui';
 import { PlanItem, RecipeEntity } from '@api/models';
-import { getCssVar, getWeekDays, getWeekStart } from '@shared/utils';
+import { getWeekDays, getWeekStart } from '@shared/utils';
 import { addPlanItemThunk, selectPlannerWeekStart } from '@store/planner-store';
 
 import './planner-modal.styles.scss';
@@ -30,7 +30,8 @@ const PlannerModal: React.FC<ConfirmationModalProps> = ({ recipe }) => {
 
   // 2) Base "anchor" week start (Monday of current week)
   const anchorWeekStart = useMemo(() => {
-    if (weekStartISO) return new Date(weekStartISO);
+    if (weekStartISO && weekStartISO === getWeekStart(new Date(), 1).toISOString())
+      return new Date(weekStartISO);
     // fallback if Redux not initialized yet
     return getWeekStart(new Date(), 1); // 1 = Monday in your utils
   }, [weekStartISO]);
@@ -58,46 +59,68 @@ const PlannerModal: React.FC<ConfirmationModalProps> = ({ recipe }) => {
 
   // When the visible week changes, default to the first day of that week
   useEffect(() => {
-    if (!days.length || period === 'current') return;
-    setSelectedDateISO(format(days[0], 'yyyy-MM-dd'));
-  }, [days, period]);
+    if (!days.length) return;
+    if (!days.some((day) => format(day, 'yyyy-MM-dd') === selectedDateISO))
+      setSelectedDateISO(format(days.find((day) => day >= today) ?? days[0], 'yyyy-MM-dd'));
+  }, [days, selectedDateISO, today]);
 
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [feedback, setFeedback] = useState('');
 
   const onConfirmClick = async () => {
     if (!selectedDateISO || !recipe || !uid) return;
 
     setSubmitting(true);
+    setError('');
     try {
       const planItem: Omit<PlanItem, 'id'> = {
         date: selectedDateISO,
         meal: selectedMeal,
         recipeId: recipe.id,
         recipeName: recipe.title,
-        recipeImgUrl: recipe.imageUrl,
+        recipeImgUrl: typeof recipe.imageUrl === 'string' ? recipe.imageUrl : '',
         userId: uid,
       };
 
-      await dispatch(addPlanItemThunk({ uid, item: planItem }));
+      await dispatch(addPlanItemThunk({ uid, item: planItem })).unwrap();
 
       setOpen(false);
-    } catch (e) {
-      // handle error
+      setFeedback('Recipe added to Planner.');
+    } catch {
+      setError('Could not add this recipe to Planner. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
   return (
     <>
-      <button type="button" className="open-modal-bnt" onClick={() => setOpen(true)}>
-        <RecIcon icon={FaRegCalendarPlus} size={24} color={getCssVar('--color-primary-light')} />
+      <button
+        type="button"
+        className="open-modal-bnt"
+        aria-label="Add to Planner"
+        onClick={() => setOpen(true)}
+      >
+        <RecIcon icon={FaRegCalendarPlus} size={24} color="var(--hub-accent)" />
+        Add to Planner
       </button>
-      <Modal isOpen={open} onClose={() => (submitting ? null : setOpen(false))} title="Plan a meal">
+      {feedback && <p role="status">{feedback}</p>}
+      <BottomSheet
+        open={open}
+        onOpenChange={(value) => {
+          if (!submitting) setOpen(value);
+        }}
+        title="Plan a meal"
+        className="plan-meal-sheet recipes-page"
+        nonDismissable={submitting}
+        showClose={!submitting}
+      >
         <div className="planner-body">
           <div className="select-week">
             <button
               type="button"
+              disabled={submitting}
               className={period === 'current' ? 'period-btn active' : 'period-btn'}
               onClick={() => setPeriod('current')}
             >
@@ -105,6 +128,7 @@ const PlannerModal: React.FC<ConfirmationModalProps> = ({ recipe }) => {
             </button>
             <button
               type="button"
+              disabled={submitting}
               className={period === 'next' ? 'period-btn active' : 'period-btn'}
               onClick={() => setPeriod('next')}
             >
@@ -125,7 +149,9 @@ const PlannerModal: React.FC<ConfirmationModalProps> = ({ recipe }) => {
                     'day-pill__selected': isSelected,
                     'day-pill__disabled': dayIsPast,
                   })}
-                  disabled={dayIsPast}
+                  aria-label={format(d, 'EEEE, MMMM d')}
+                  aria-pressed={isSelected}
+                  disabled={dayIsPast || submitting}
                   onClick={() => setSelectedDateISO(iso)}
                 >
                   <span className="day-pill-name">{format(d, 'EEE')}</span>
@@ -137,28 +163,35 @@ const PlannerModal: React.FC<ConfirmationModalProps> = ({ recipe }) => {
 
           <div className="meal-selector">
             {MEAL_SLOTS.map((meal, index) => (
-              <div
+              <button
                 key={index}
+                type="button"
+                disabled={submitting}
+                aria-pressed={selectedMeal === meal}
                 className={clsx('meal-box', { 'meal-box__selected': selectedMeal === meal })}
                 onClick={() => setSelectedMeal(meal)}
               >
                 {meal}
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
-        <Button
-          variant="primary"
+        {error && <p role="alert">{error}</p>}
+        <button
           type="button"
           onClick={onConfirmClick}
-          isLoading={submitting}
-          className="save-btn"
-          disabled={!selectedMeal || !selectedDateISO}
+          className="recipes-action recipes-action--primary plan-meal-save"
+          disabled={
+            submitting ||
+            !selectedMeal ||
+            !selectedDateISO ||
+            !days.some((day) => day >= today && format(day, 'yyyy-MM-dd') === selectedDateISO)
+          }
         >
-          <span>Save</span>
-        </Button>
-      </Modal>
+          <span>{submitting ? 'Saving…' : 'Save'}</span>
+        </button>
+      </BottomSheet>
     </>
   );
 };

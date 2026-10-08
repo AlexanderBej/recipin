@@ -1,9 +1,9 @@
 import React from 'react';
 import { expect, test, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 
 import App from './App';
 import authReducer, {
@@ -13,16 +13,21 @@ import authReducer, {
 } from './store/auth-store/auth.slice';
 
 vi.mock('@shared/providers', () => ({ initApp: () => vi.fn() }));
+vi.mock('@store/index', () => {
+  const ready = { booting: false };
+  return { selectAppBootState: () => ready };
+});
 vi.mock('@shared/ui', async () => ({
   Spinner: (await import('./shared/ui/spinner/spinner.component')).default,
 }));
 
-// Keep the real App routes and guard; page stubs avoid unrelated UI and Firebase imports.
+// Keep the real routes, guard, shell, and landing; legacy page stubs avoid Firebase imports.
 vi.mock('@pages', async () => {
-  const { Outlet, useLocation, useParams } = await import('react-router-dom');
+  const { useLocation, useParams } = await import('react-router-dom');
   const Placeholder = () => <h1>Other page</h1>;
   return {
-    Layout: () => <Outlet />,
+    Layout: (await import('./pages/layout/layout.component')).default,
+    FoodHub: (await import('./pages/food-hub/food-hub.component')).default,
     Login: () => {
       const location = useLocation();
       const from = location.state?.from;
@@ -34,11 +39,13 @@ vi.mock('@pages', async () => {
       );
     },
     Library: () => <h1>Recipe library</h1>,
+    RecipesDiscovery: () => <h1>Recipes discovery</h1>,
     RecipeDetails: () => <h1>Recipe {useParams().id}</h1>,
+    Cooking: () => <h1>Cooking {useParams().id}</h1>,
     Create: Placeholder,
-    Grocery: Placeholder,
+    Grocery: () => <h2>Grocery content</h2>,
     Import: Placeholder,
-    Planner: Placeholder,
+    Planner: () => <h2>Planner content</h2>,
     Profile: Placeholder,
   };
 });
@@ -51,6 +58,16 @@ const user = {
   createdAt: '',
 };
 
+function HistoryControls() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <button onClick={() => navigate(-1)}>Test back</button>
+      <button onClick={() => navigate(1)}>Test forward</button>
+    </>
+  );
+}
+
 function renderRoute(path: string, state: 'idle' | 'loading' | 'guest' | 'authenticated') {
   const store = configureStore({ reducer: { auth: authReducer } });
   if (state === 'guest') store.dispatch(userSignedOut());
@@ -61,6 +78,7 @@ function renderRoute(path: string, state: 'idle' | 'loading' | 'guest' | 'authen
     <Provider store={store}>
       <MemoryRouter initialEntries={[path]}>
         <App />
+        <HistoryControls />
       </MemoryRouter>
     </Provider>,
   );
@@ -87,8 +105,81 @@ test('keeps the login route public', () => {
 });
 
 test('opens the library for an authenticated user', () => {
-  renderRoute('/', 'authenticated');
+  renderRoute('/recipes/library', 'authenticated');
   expect(screen.getByRole('heading', { name: 'Recipe library' })).toBeInTheDocument();
+});
+
+test('opens Food Hub at the authenticated root with an inactive Restaurants card', () => {
+  renderRoute('/', 'authenticated');
+  expect(screen.getByRole('heading', { name: 'Food Hub', level: 1 })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Recipes' })).toHaveAttribute('href', '/recipes');
+  expect(screen.getByRole('article', { name: 'Restaurants' })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
+  expect(screen.queryByRole('link', { name: /Restaurants/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/profile');
+  expect(screen.queryByRole('navigation', { name: 'Recipe tools' })).not.toBeInTheDocument();
+});
+
+test.each([
+  '/',
+  '/recipes',
+  '/recipes/library',
+  '/planner',
+  '/grocery',
+  '/recipes/new',
+  '/recipe/soup/edit',
+])('protects %s from guest access', (path) => {
+  renderRoute(path, 'guest');
+  expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument();
+  expect(screen.getByText(`Return to ${path}`)).toBeInTheDocument();
+});
+
+test.each(['/recipes/new', '/recipe/soup/edit?section=ingredients', '/create'])(
+  'opens the unified authenticated editor at %s',
+  (path) => {
+    renderRoute(path, 'authenticated');
+    expect(screen.getByRole('heading', { name: 'Other page' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'World' })).toHaveValue('/recipes');
+  },
+);
+
+test.each([
+  ['/planner', 'Planner content'],
+  ['/grocery', 'Grocery content'],
+])('preserves %s', (path, heading) => {
+  renderRoute(path, 'authenticated');
+  expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
+  expect(screen.getByRole('combobox', { name: 'World' })).toHaveValue('/recipes');
+});
+
+test('switches worlds and recipe tools while preserving back and forward navigation', () => {
+  renderRoute('/', 'authenticated');
+  expect(screen.getByRole('option', { name: 'Restaurants (coming soon)' })).toBeDisabled();
+  fireEvent.change(screen.getByRole('combobox', { name: 'World' }), {
+    target: { value: '/recipes' },
+  });
+  expect(screen.getByRole('heading', { name: 'Recipes discovery' })).toBeInTheDocument();
+  const tools = screen.getByRole('navigation', { name: 'Recipe tools' });
+  fireEvent.click(within(tools).getByRole('link', { name: 'Library' }));
+  expect(screen.getByRole('heading', { name: 'Recipe library' })).toBeInTheDocument();
+  fireEvent.click(within(tools).getByRole('link', { name: 'Planner' }));
+  expect(screen.getByRole('heading', { name: 'Planner content' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('link', { name: 'Groceries' }));
+  expect(screen.getByRole('heading', { name: 'Grocery content' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Test back' }));
+  expect(screen.getByRole('heading', { name: 'Planner content' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Test forward' }));
+  expect(screen.getByRole('heading', { name: 'Grocery content' })).toBeInTheDocument();
+  fireEvent.change(screen.getByRole('combobox', { name: 'World' }), { target: { value: '/' } });
+  expect(screen.getByRole('heading', { name: 'Food Hub', level: 1 })).toBeInTheDocument();
+});
+
+test('keeps creation available and redirects the old library alias', () => {
+  renderRoute('/library', 'authenticated');
+  expect(screen.getByRole('heading', { name: 'Recipe library' })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'New recipe' })).toHaveAttribute('href', '/create');
 });
 
 test('opens the requested recipe after authentication resolves', () => {
@@ -106,4 +197,15 @@ test('removes protected content when authentication is lost', () => {
   });
   expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'Recipe recipe-123' })).not.toBeInTheDocument();
+});
+
+test('Cooking route remains authenticated and uses a distraction-free shell', () => {
+  const first = renderRoute('/recipe/pesto/cook', 'guest');
+  expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument();
+  expect(screen.getByText('Return to /recipe/pesto/cook')).toBeInTheDocument();
+  first.unmount();
+  renderRoute('/recipe/pesto/cook', 'authenticated');
+  expect(screen.getByRole('heading', { name: 'Cooking pesto' })).toBeInTheDocument();
+  expect(screen.queryByRole('combobox', { name: 'World' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('navigation', { name: 'Recipe tools' })).not.toBeInTheDocument();
 });

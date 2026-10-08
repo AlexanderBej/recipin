@@ -29,10 +29,11 @@ const grocerySlice = createSlice({
       state,
       action: PayloadAction<{ recipeId: string; itemId: string; checked: boolean }>,
     ) {
-      const recipe = state.recipes.find((rec) => rec.recipeId === action.payload.recipeId);
-      const item = recipe?.items.find((item) => item.id === action.payload.itemId);
-      if (item) {
-        item.checked = action.payload.checked;
+      for (const recipe of state.recipes.filter(
+        (rec) => rec.recipeId === action.payload.recipeId,
+      )) {
+        const item = recipe.items?.find((item) => item.id === action.payload.itemId);
+        if (item) item.checked = action.payload.checked;
       }
     },
     clearGrocery(state) {

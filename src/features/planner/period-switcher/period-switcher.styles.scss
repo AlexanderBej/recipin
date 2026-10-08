@@ -7,11 +7,13 @@
   gap: $spacing-1;
   margin: $spacing-3 auto;
   width: fit-content;
+  max-width: 100%;
   // margin: auto;
   height: 55px;
   align-items: center;
 
   .period-toggler {
+    flex-shrink: 0;
     height: 100%;
     aspect-ratio: 1;
     background-color: $color-bg-card;
@@ -29,6 +31,7 @@
   }
 
   .week-range {
+    min-width: 0;
     position: relative;
     width: 200px;
     background-color: $color-bg-card;

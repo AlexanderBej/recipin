@@ -1,5 +1,6 @@
 export * from './create';
 export * from './grocery';
+export { default as FoodHub } from './food-hub/food-hub.component';
 export * from './import';
 export * from './layout';
 export * from './library';
@@ -7,3 +8,5 @@ export * from './login';
 export * from './planner';
 export * from './profile';
 export * from './recipe-details';
+export { default as Cooking } from './cooking/cooking.component';
+export { default as RecipesDiscovery } from './recipes-discovery/recipes-discovery.component';

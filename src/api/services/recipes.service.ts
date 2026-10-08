@@ -17,6 +17,7 @@ import {
   updateDoc,
   startAt,
   endAt,
+  runTransaction,
 } from 'firebase/firestore';
 
 import { db } from '@lib/firebase';
@@ -34,6 +35,28 @@ const cardsCol = collection(db, 'recipe_cards');
 
 const toMillis = (v: any): number | null =>
   v && typeof v.toMillis === 'function' ? v.toMillis() : null;
+
+// Discovery uses the complete personal card collection, independently of Library queries.
+export async function listDiscoveryRecipeCards(uid: string): Promise<RecipeCard[]> {
+  const snap = await getDocs(query(cardsCol, where('authorId', '==', uid)));
+  return snap.docs.map((d) => {
+    const x = d.data();
+    return {
+      id: d.id,
+      authorId: x.authorId,
+      title: x.title,
+      category: x.category,
+      tags: Array.isArray(x.tags) ? x.tags : [],
+      difficulty: x.difficulty,
+      imageUrl: x.imageUrl,
+      excerpt: x.excerpt,
+      isFavorite: x.isFavorite,
+      ratingCategories: x.ratingCategories,
+      createdAt: toMillis(x.createdAt),
+      updatedAt: toMillis(x.updatedAt),
+    };
+  });
+}
 
 export async function listRecipeCardsByOwnerPaged(
   uid: string,
@@ -170,12 +193,15 @@ export async function getRecipe(id: string): Promise<RecipeEntity | null> {
   const ref = doc(recipesCol, id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  const d = snap.data() as any;
+  return recipeFromData(snap.id, snap.data());
+}
+
+function recipeFromData(id: string, d: DocumentData): RecipeEntity {
   return {
-    id: snap.id,
+    id,
     authorId: d.authorId,
     title: d.title,
-    titleSearch: makeTitleSearch(d.title),
+    titleSearch: makeTitleSearch(typeof d.title === 'string' ? d.title : ''),
     category: d.category,
     tags: d.tags ?? [],
     difficulty: d.difficulty ?? null,
@@ -195,6 +221,104 @@ export async function getRecipe(id: string): Promise<RecipeEntity | null> {
   };
 }
 
+const editableFields = [
+  'title',
+  'description',
+  'category',
+  'difficulty',
+  'tags',
+  'servings',
+  'prepMinutes',
+  'cookMinutes',
+  'ingredients',
+  'steps',
+  'imageUrl',
+] as const;
+
+// Include content as well as the timestamp: legacy writers may not update updatedAt.
+export function recipeRevision(data: DocumentData): string {
+  return JSON.stringify([
+    data.updatedAt ?? null,
+    ...editableFields.map((field) => data[field] ?? null),
+  ]);
+}
+
+export async function getRecipeForEditing(uid: string, id: string) {
+  const snap = await getDoc(doc(recipesCol, id));
+  if (!snap.exists()) return null;
+  const data = snap.data();
+  if (data.authorId !== uid) throw new Error('You cannot edit this recipe.');
+  return { recipe: recipeFromData(id, data), revision: recipeRevision(data) };
+}
+
+export type UpdateRecipeInput = {
+  uid: string;
+  id: string;
+  expectedRevision: string;
+  changes: DocumentData;
+};
+
+export async function updateRecipePair({ uid, id, expectedRevision, changes }: UpdateRecipeInput) {
+  return runTransaction(db, async (transaction) => {
+    const recipeRef = doc(recipesCol, id);
+    const cardRef = doc(cardsCol, id);
+    const recipeSnap = await transaction.get(recipeRef);
+    const cardSnap = await transaction.get(cardRef);
+    if (!recipeSnap.exists()) throw new Error('This recipe no longer exists.');
+    const current = recipeSnap.data();
+    if (current.authorId !== uid) throw new Error('You cannot edit this recipe.');
+    if (recipeRevision(current) !== expectedRevision) {
+      const error = new Error(
+        'This recipe changed. Discard this draft and reload the latest version before saving.',
+      );
+      error.name = 'RecipeEditConflict';
+      throw error;
+    }
+    const patch: DocumentData = {};
+    for (const field of editableFields) {
+      if (Object.hasOwn(changes, field) && changes[field] !== undefined)
+        patch[field] = changes[field];
+    }
+    const merged = { ...current, ...patch };
+    const derived = {
+      titleSearch: makeTitleSearch(typeof merged.title === 'string' ? merged.title : ''),
+      excerpt: typeof merged.description === 'string' ? merged.description.slice(0, 140) : '',
+    };
+    const cardPatch: DocumentData = { ...derived, updatedAt: serverTimestamp() };
+    for (const field of ['title', 'category', 'difficulty', 'tags', 'imageUrl']) {
+      if (Object.hasOwn(patch, field)) cardPatch[field] = patch[field];
+    }
+    transaction.update(recipeRef, { ...patch, ...derived, updatedAt: serverTimestamp() });
+    let cardData: DocumentData;
+    if (cardSnap.exists()) {
+      transaction.update(cardRef, cardPatch);
+      cardData = { ...cardSnap.data(), ...cardPatch };
+    } else {
+      cardData = {
+        authorId: uid,
+        title: merged.title,
+        category: merged.category ?? null,
+        tags: merged.tags ?? [],
+        difficulty: merged.difficulty ?? null,
+        imageUrl: merged.imageUrl ?? null,
+        isFavorite: merged.isFavorite ?? false,
+        ratingCategories: merged.ratingCategories ?? null,
+        createdAt: merged.createdAt ?? serverTimestamp(),
+        ...cardPatch,
+      };
+      transaction.set(cardRef, cardData);
+    }
+    const recipe = recipeFromData(id, { ...merged, ...derived, updatedAt: null });
+    const card = {
+      ...cardData,
+      id,
+      createdAt: toMillis(cardData.createdAt),
+      updatedAt: null,
+    } as RecipeCard;
+    return { recipe, card };
+  });
+}
+
 export async function addRecipePair(data: CreateRecipeInput) {
   const batch = writeBatch(db);
   const recipeRef = doc(recipesCol); // generate ID once
@@ -202,18 +326,29 @@ export async function addRecipePair(data: CreateRecipeInput) {
 
   const now = { createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   const titleSearch = makeTitleSearch(data.title);
-  const recipeDoc: DocumentData = { ...data, ...now, isPublic: data.isPublic ?? false };
+  const definedData = Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined),
+  );
+  const recipeDoc: DocumentData = {
+    ...definedData,
+    titleSearch,
+    excerpt: (data.description ?? '').slice(0, 140),
+    ...now,
+    isPublic: data.isPublic ?? false,
+  };
   batch.set(recipeRef, recipeDoc);
 
   const cardDoc: DocumentData = {
     authorId: data.authorId,
     title: data.title,
     titleSearch,
-    category: data.category,
+    category: data.category ?? null,
     tags: data.tags ?? [],
     difficulty: data.difficulty ?? null,
     imageUrl: data.imageUrl ?? null,
     excerpt: (data.description ?? '').slice(0, 140),
+    isFavorite: data.isFavorite ?? false,
+    ratingCategories: data.ratingCategories ?? null,
     ...now,
   };
   batch.set(cardRef, cardDoc);
@@ -228,7 +363,6 @@ export async function addRecipePair(data: CreateRecipeInput) {
     titleSearch,
     category: cardDoc.category,
     tags: cardDoc.tags,
-    isFavorite: false,
     ...cardDoc,
     createdAt: null, // server sets it; you can refetch page or leave null until next load
     updatedAt: null,

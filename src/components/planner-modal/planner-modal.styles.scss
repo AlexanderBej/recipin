@@ -1,86 +1,93 @@
-@use '../../styles/global.scss' as *;
-
-.select-week {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-
+.plan-meal-sheet {
+  background: var(--hub-surface);
+  color: var(--hub-text);
+  border-radius: 6px 6px 0 0;
+  .bs__title,
+  .bs__close {
+    color: var(--hub-text);
+  }
+  .bs__header {
+    border-color: var(--hub-line);
+  }
+  button {
+    cursor: pointer;
+    font: inherit;
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+  .select-week {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+  }
   .period-btn {
     flex: 1;
-    padding: 0.5rem 0.75rem;
-    border-radius: 999px;
-    border: 1px solid $color-neutral;
-    background: transparent;
-    color: $color-text-secondary;
-    font-size: 0.9rem;
-    cursor: pointer;
-
+    background: none;
+    color: var(--hub-muted);
+    border: 1px solid var(--hub-line);
+    padding: 12px;
+    border-radius: 4px;
     &.active {
-      background: $color-bg-card-light;
-      border-color: $color-primary;
-      color: $color-primary;
+      border-color: var(--recipes-accent);
+      color: var(--hub-text);
     }
   }
-}
-
-.days-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin-top: $spacing-6;
-}
-
-.day-pill {
-  border-radius: 999px;
-  padding: $spacing-2;
-  aspect-ratio: 1;
-  background: $color-neutral;
-  color: $color-text-secondary;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 12px;
-
-  &__selected {
-    background: $color-primary;
-    color: $color-text-primary;
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
   }
-
-  .day-pill-name {
-    font-weight: 500;
-  }
-
-  .day-pill-number {
-    font-size: 0.85rem;
-  }
-}
-
-.meal-selector {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $spacing-2;
-  margin-top: $spacing-6;
-
-  .meal-box {
-    border: 1px solid $color-neutral;
-    border-radius: 999px;
-    height: 45px;
-    text-transform: capitalize;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-
+  .day-pill {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+    padding: 12px 2px;
+    background: var(--hub-bg);
+    color: var(--hub-muted);
+    border: 1px solid var(--hub-line);
+    border-radius: 4px;
+    font-size: 13px;
     &__selected {
-      border-color: $color-primary;
-      background-color: $color-bg-card-light;
-      color: $color-primary;
+      border-color: var(--recipes-accent);
+      color: var(--hub-text);
+    }
+  }
+  .meal-selector {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 24px;
+    .meal-box {
+      min-width: 0;
+      min-height: 44px;
+      padding: 8px 2px;
+      font-size: 12px;
+      border: 1px solid var(--hub-line);
+      border-radius: 4px;
+      color: var(--hub-muted);
+      background: none;
+      text-transform: capitalize;
+      &__selected {
+        color: var(--hub-text);
+        border-color: var(--recipes-accent);
+      }
     }
   }
 }
-
-.save-btn {
-  margin: $spacing-6 auto 0;
-  display: block;
+.plan-meal-save {
+  display: flex;
+  margin: 24px 0;
+  width: 100%;
+}
+@media (max-width: 390px) {
+  .plan-meal-sheet .days-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-meal-sheet {
+    transform: none;
+  }
 }

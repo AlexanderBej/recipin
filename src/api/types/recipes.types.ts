@@ -42,4 +42,9 @@ export type FireDate = Timestamp | FieldValue | null | undefined;
 
 export type RatingCategory = 'taste' | 'ease' | 'health' | 'presentation' | 'value';
 
-export type CreateRecipeInput = Omit<RecipeEntity, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateRecipeInput = Omit<
+  RecipeEntity,
+  'id' | 'createdAt' | 'updatedAt' | 'category'
+> & {
+  category?: RecipeCategory;
+};

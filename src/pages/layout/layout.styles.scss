@@ -1,19 +1,90 @@
-@use '../../styles/global.scss' as *;
+@use '../../styles/food-hub';
 
-.main-layout {
-  height: 100dvh;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  overflow: hidden;
+.food-hub-shell {
+  min-height: 100dvh;
+  background: var(--hub-bg);
+  color: var(--hub-text);
+  font-family: var(--hub-font-body);
+  letter-spacing: 0;
 
-  .outlet-container {
-    flex: 1 1 auto;
-    min-height: 0; /* IMPORTANT: allow child to be smaller than content */
-    overflow: auto;
+  :focus-visible {
+    outline: 2px solid var(--hub-accent);
+    outline-offset: 5px;
+  }
+}
+
+.hub-content {
+  width: min(100%, var(--hub-content-width));
+  margin: 0 auto;
+  padding: var(--hub-space-6) var(--hub-gutter) calc(48px + env(safe-area-inset-bottom, 0px));
+  min-width: 0;
+  &--landing {
+    max-width: var(--hub-width);
     width: 100%;
-    margin-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
-    padding: $spacing-5;
+  }
+  &--collection {
+    max-width: var(--hub-width);
+    width: 100%;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+.hub-page-heading {
+  display: flex;
+  gap: var(--hub-space-3);
+  align-items: center;
+  margin-bottom: var(--hub-space-6);
+  h1 {
+    font: 500 28px/1.2 var(--hub-font-body);
+  }
+}
+
+.hub-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--hub-radius);
+  color: var(--hub-text);
+  transition: background var(--hub-motion);
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+  &:hover {
+    background: var(--hub-surface);
+  }
+  &::after {
+    display: none;
+  }
+}
+
+.hub-skip-link {
+  position: fixed;
+  left: 16px;
+  top: -80px;
+  z-index: 100;
+  padding: 12px 20px;
+  color: var(--hub-bg);
+  background: var(--hub-text);
+  &:focus {
+    top: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hub-page-heading h1 {
+    font-size: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .food-hub-shell {
+    --hub-motion: 0s;
   }
 }

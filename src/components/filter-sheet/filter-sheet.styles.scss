@@ -4,6 +4,44 @@
   color: $color-error;
 }
 
+.collection-filter-dialog {
+  background: var(--hub-surface);
+  color: var(--hub-text);
+  .chip {
+    background: var(--hub-bg);
+    color: var(--hub-text);
+  }
+  .chip__active {
+    background: var(--hub-accent);
+    color: var(--hub-bg);
+  }
+  .filter-btn-wrapper {
+    position: sticky;
+    width: 100%;
+    padding: 20px 0;
+    background: var(--hub-surface);
+  }
+  .apply-filter-btn {
+    background: var(--hub-accent);
+    color: var(--hub-bg);
+  }
+  .bs__footer .apply-filter-btn {
+    width: 100%;
+  }
+  .load-more-btn,
+  .clear-all-btn {
+    color: var(--hub-accent);
+  }
+  .filter-sheet {
+    height: auto;
+    overflow: visible;
+    .filter-options {
+      height: auto;
+      overflow: visible;
+    }
+  }
+}
+
 .filter-sheet {
   width: 100%;
   display: flex;

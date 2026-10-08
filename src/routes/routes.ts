@@ -15,6 +15,7 @@ export type NavItem = {
   title: string | TitleResolver;
   documentTitle?: (title: string) => string;
   icon?: IconType;
+  world?: 'recipes';
 };
 
 // type RouteMeta = {
@@ -28,15 +29,38 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   {
-    key: 'library',
+    key: 'cooking',
+    path: '/recipe/:id/cook',
+    world: 'recipes',
+    shortLabel: 'Cooking',
+    title: 'Cooking Mode',
+  },
+  {
+    key: 'hub',
     path: '/',
+    shortLabel: 'Food Hub',
+    title: 'Food Hub',
+    documentTitle: () => 'Food Hub',
+  },
+  {
+    key: 'discovery',
+    path: '/recipes',
+    world: 'recipes',
+    shortLabel: 'Discover',
+    title: 'Recipes',
+  },
+  {
+    key: 'library',
+    path: '/recipes/library',
+    world: 'recipes',
     shortLabel: 'Library',
-    title: 'Library',
+    title: 'Recipe Library',
     icon: PiBowlFoodFill,
     actions: ['search'],
   },
   {
     key: 'grocery',
+    world: 'recipes',
     path: '/grocery',
     shortLabel: 'Groceries',
     showBack: true,
@@ -45,6 +69,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     key: 'planner',
+    world: 'recipes',
     path: '/planner',
     shortLabel: 'Planner',
     title: 'Planner',
@@ -60,6 +85,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     key: 'recipe',
+    world: 'recipes',
     path: '/recipe/:id',
     shortLabel: 'Details',
     title: 'Recipe details',
@@ -68,20 +94,23 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     key: 'create',
-    path: '/create',
+    world: 'recipes',
+    path: '/recipes/new',
     shortLabel: 'Create',
     title: 'Create recipe',
     showBack: true,
   },
   {
     key: 'edit',
-    path: '/create/:id',
+    world: 'recipes',
+    path: '/recipe/:id/edit',
     shortLabel: 'Edit',
     title: 'edit recipe',
     showBack: true,
   },
   {
     key: 'import',
+    world: 'recipes',
     path: '/import',
     shortLabel: 'Import',
     title: 'Bulk import',

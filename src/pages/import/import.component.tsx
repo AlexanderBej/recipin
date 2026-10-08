@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { selectAuthUserId } from '@store/auth-store';
 import { addRecipePair } from '@api/services';
-import { CreateRecipeInput } from '@api/types';
+import { AppDispatch, CreateRecipeInput } from '@api/types';
+import { invalidateDiscovery } from '@store/recipes-store';
 
 import './import.styles.scss';
 import { Button } from '@shared/ui';
 
 const Import: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const [raw, setRaw] = useState('');
   const [log, setLog] = useState<string[]>([]);
   const uid = useSelector(selectAuthUserId);
@@ -67,6 +69,7 @@ const Import: React.FC = () => {
       }
     }
 
+    if (success) dispatch(invalidateDiscovery());
     setLog((l) => [...l, `Import finished. Success: ${success}, Failed: ${failure}.`]);
   };
 

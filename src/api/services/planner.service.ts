@@ -15,6 +15,7 @@ import { addDays, formatISO } from 'date-fns';
 
 import { db } from '@lib/firebase';
 import { PlanItem } from '@api/models';
+import { MEAL_SLOTS } from '@api/misc';
 
 // Collection reference (could also be exported from a central api/services file)
 const plannerCol = collection(db, 'planner_items');
@@ -27,12 +28,17 @@ function mapDocToPlanItem(d: any): PlanItem {
 
   return {
     id: d.id,
-    userId: d.userId,
-    date: data.date,
-    meal: data.meal,
-    recipeId: data.recipeId,
-    recipeName: data.name,
-    recipeImgUrl: data.recipeImgUrl,
+    userId: typeof data.userId === 'string' ? data.userId : '',
+    date: typeof data.date === 'string' ? data.date : '',
+    meal: MEAL_SLOTS.includes(data.meal) ? data.meal : 'snacks',
+    recipeId: typeof data.recipeId === 'string' ? data.recipeId : '',
+    recipeName:
+      typeof data.recipeName === 'string' && data.recipeName.trim()
+        ? data.recipeName
+        : typeof data.name === 'string' && data.name.trim()
+          ? data.name
+          : 'Untitled recipe',
+    recipeImgUrl: typeof data.recipeImgUrl === 'string' ? data.recipeImgUrl : undefined,
     servings: data.servings,
     notes: data.notes,
   };
@@ -54,7 +60,7 @@ export async function addPlanItem(uid: string, input: Omit<PlanItem, 'id'>): Pro
     meal: input.meal,
     recipeId: input.recipeId,
     recipeName: input.recipeName,
-    recipeImgUrl: input.recipeImgUrl,
+    recipeImgUrl: input.recipeImgUrl ?? null,
     servings: input.servings ?? null,
     notes: input.notes ?? null,
     createdAt: now,

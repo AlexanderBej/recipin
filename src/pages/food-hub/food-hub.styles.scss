@@ -1,0 +1,178 @@
+.food-hub {
+  padding-top: 36px;
+}
+.food-hub__intro {
+  margin-bottom: 44px;
+  h1 {
+    font: 400 88px/1.08 var(--hub-font-display);
+    margin: 16px 0;
+    color: var(--hub-text);
+    span {
+      color: var(--hub-accent);
+    }
+  }
+}
+.food-hub__eyebrow {
+  color: var(--hub-accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+.food-hub__subtitle {
+  font-size: 18px;
+  color: var(--hub-muted);
+  line-height: 1.5;
+}
+.hub-worlds {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.hub-world-card {
+  position: relative;
+  min-width: 0;
+  height: 420px;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--hub-radius);
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--hub-text);
+  background: var(--hub-surface);
+  > img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  &--recipes > img {
+    object-position: center 61%;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(0 0 0 / 45%),
+      transparent 30%,
+      transparent 45%,
+      rgb(0 0 0 / 86%)
+    );
+    z-index: -1;
+  }
+  &::after {
+    display: none;
+  }
+  &--recipes {
+    transition: border-color var(--hub-motion);
+  }
+  &--recipes:hover {
+    border-color: var(--hub-accent);
+  }
+  &--recipes:hover .hub-world-card__arrow {
+    background: var(--hub-text);
+    color: var(--hub-bg);
+  }
+}
+.hub-world-card__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+.hub-world-card__soon {
+  margin-left: auto;
+  background: rgb(21 23 22 / 85%);
+  padding: 8px 10px;
+  border: 1px solid #79786c;
+  border-radius: 3px;
+  font-size: 12px;
+}
+.hub-world-card__content {
+  position: absolute;
+  inset: auto 28px 28px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  h2 {
+    font: 400 44px/1.15 var(--hub-font-display);
+    overflow-wrap: anywhere;
+  }
+  p {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #e0e1d9;
+  }
+}
+.hub-world-card__arrow {
+  flex: 0 0 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #b2b4a8;
+  border-radius: 50%;
+  transition:
+    background var(--hub-motion),
+    color var(--hub-motion);
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+.food-hub__signoff {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--hub-line);
+  margin-top: 32px;
+  padding-top: 24px;
+  color: var(--hub-muted);
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .food-hub {
+    padding-top: 20px;
+  }
+  .food-hub__intro {
+    margin-bottom: 32px;
+  }
+  .food-hub__intro h1 {
+    font-size: 64px;
+  }
+  .hub-worlds {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .hub-world-card {
+    height: 360px;
+  }
+}
+@media (max-width: 400px) {
+  .food-hub__intro h1 {
+    font-size: 56px;
+  }
+  .hub-world-card {
+    height: 320px;
+  }
+  .hub-world-card__top {
+    padding: 16px;
+    gap: 8px;
+  }
+  .hub-world-card__content {
+    left: 20px;
+    right: 20px;
+    bottom: 24px;
+  }
+  .hub-world-card__content h2 {
+    font-size: 36px;
+  }
+}

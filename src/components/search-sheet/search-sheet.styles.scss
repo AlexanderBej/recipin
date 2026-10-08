@@ -1,28 +1,83 @@
-@use '../../styles/global.scss' as *;
-
-.search-input {
-  border: 1px solid $color-bg-card;
-  border-radius: $radius-lg;
+.planner-add-recipe {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 0;
+  padding: 10px 0;
+  min-height: 44px;
+  color: var(--recipes-accent);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
 }
-
-.search-results {
-  width: 100%;
+.planner-search-sheet {
+  background: var(--hub-surface);
+  color: var(--hub-text);
+  border-radius: 6px 6px 0 0;
+  .bs__title,
+  .bs__close {
+    color: var(--hub-text);
+  }
+  .bs__header {
+    border-color: var(--hub-line);
+  }
+}
+.planner-search-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border: 1px solid var(--hub-line);
+  border-radius: 4px;
+  margin: 16px 0;
+  input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    padding: 12px 0;
+    color: var(--hub-text);
+    background: none;
+    font-size: 16px;
+  }
+}
+.planner-search-results {
   display: grid;
-  gap: $spacing-2;
-  margin-top: $spacing-3;
-
-  .recipe-row {
-    height: 70px;
-    color: $color-text-primary;
-    background-color: $color-bg-card;
-    border-radius: $radius-lg;
-    display: inline-flex;
+  gap: 8px;
+  padding-bottom: 24px;
+  button {
+    width: 100%;
+    display: flex;
     align-items: center;
-    gap: $spacing-5;
-
-    .recipe-image {
-      height: 100%;
-      border-radius: $radius-lg;
-    }
+    gap: 12px;
+    text-align: left;
+    min-height: 70px;
+    padding: 8px;
+    border: 1px solid var(--hub-line);
+    border-radius: 4px;
+    background: var(--hub-bg);
+    color: var(--hub-text);
+    cursor: pointer;
+  }
+  span {
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+  .collection-photo {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+  }
+  .collection-photo__fallback span {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .planner-search-sheet {
+    transform: none;
   }
 }

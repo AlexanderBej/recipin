@@ -1,4 +1,5 @@
 import { GroceryItem, GroceryRecipe } from '@api/models';
+import { buildIngredient } from './formatters.util';
 
 export function buildIngredientText(
   ingredients: GroceryItem[],
@@ -6,7 +7,9 @@ export function buildIngredientText(
 ) {
   const filtered = onlyUnchecked ? ingredients.filter((i) => !i.checked) : ingredients;
 
-  return filtered.map((ing) => ing.name).join('\n');
+  return filtered
+    .map((ing) => buildIngredient({ item: ing.name, quantity: ing.quantity, unit: ing.unit }))
+    .join('\n');
 }
 
 export function buildPageIngredientsText(
