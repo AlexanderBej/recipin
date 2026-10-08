@@ -1,0 +1,61 @@
+.restaurant-picker__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  select {
+    background: #252624;
+    color: #f4f1e9;
+    border: 1px solid #59564e;
+    border-radius: 4px;
+    padding: 8px;
+    max-width: 180px;
+  }
+  input {
+    accent-color: #bb9866;
+  }
+}
+.restaurant-picker__reveal {
+  max-width: 640px;
+  margin-top: 24px;
+  > .restaurant-action {
+    margin-top: 16px;
+  }
+}
+.restaurant-picker__cards {
+  position: relative;
+  isolation: isolate;
+}
+.restaurant-picker__back {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #746348;
+  background: #272823;
+  border-radius: 8px;
+  z-index: -1;
+  pointer-events: none;
+}
+.restaurant-cleanup-notice {
+  padding: 16px;
+  color: #f4f1e9;
+  background: #343129;
+  line-height: 1.6;
+  a {
+    color: #d6b77e;
+  }
+}
+@media (max-width: 390px) {
+  .restaurant-picker .restaurant-section-heading {
+    flex-wrap: wrap;
+  }
+  .restaurant-picker__filters label {
+    flex-wrap: wrap;
+  }
+}

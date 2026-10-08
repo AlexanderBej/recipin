@@ -10,3 +10,6 @@ export * from './profile';
 export * from './recipe-details';
 export { default as Cooking } from './cooking/cooking.component';
 export { default as RecipesDiscovery } from './recipes-discovery/recipes-discovery.component';
+export { default as RestaurantsDiscovery } from './restaurants/restaurants-discovery.component';
+export { default as RestaurantsLibrary } from './restaurants/restaurants-library.component';
+export { default as RestaurantDetail } from './restaurants/restaurant-detail.component';

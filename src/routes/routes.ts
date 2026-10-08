@@ -15,7 +15,7 @@ export type NavItem = {
   title: string | TitleResolver;
   documentTitle?: (title: string) => string;
   icon?: IconType;
-  world?: 'recipes';
+  world?: 'recipes' | 'restaurants';
 };
 
 // type RouteMeta = {
@@ -28,6 +28,27 @@ export type NavItem = {
 // };
 
 export const NAV_ITEMS: NavItem[] = [
+  {
+    key: 'restaurant-detail',
+    path: '/restaurant/:id',
+    world: 'restaurants',
+    shortLabel: 'Notebook',
+    title: 'Restaurant notebook',
+  },
+  {
+    key: 'restaurants-discovery',
+    path: '/restaurants',
+    world: 'restaurants',
+    shortLabel: 'Discover',
+    title: 'Restaurants',
+  },
+  {
+    key: 'restaurants-library',
+    path: '/restaurants/library',
+    world: 'restaurants',
+    shortLabel: 'Library',
+    title: 'Restaurant Library',
+  },
   {
     key: 'cooking',
     path: '/recipe/:id/cook',

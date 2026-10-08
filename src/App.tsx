@@ -16,6 +16,9 @@ import {
   RecipeDetails,
   RecipesDiscovery,
   Cooking,
+  RestaurantsDiscovery,
+  RestaurantsLibrary,
+  RestaurantDetail,
 } from '@pages';
 import { initApp } from '@shared/providers';
 import { AppDispatch } from '@store/store';
@@ -42,6 +45,9 @@ function App() {
         <Route index element={<FoodHub />} />
         <Route path="/recipes" element={<RecipesDiscovery />} />
         <Route path="/recipes/library" element={<Library />} />
+        <Route path="/restaurants" element={<RestaurantsDiscovery />} />
+        <Route path="/restaurants/library" element={<RestaurantsLibrary />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
         <Route path="/library" element={<Navigate to="/recipes/library" replace />} />
         <Route path="/create" element={<Navigate to="/recipes/new" replace />} />
         <Route path="/recipes/new" element={<Create />} />

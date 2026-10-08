@@ -5,6 +5,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 
 import { Spinner } from '@shared/ui';
 import FoodHubHeader from '../../components/food-hub-header/food-hub-header.component';
+import RestaurantsProvider from '../../features/restaurants/restaurants.provider';
 import { useHeaderModel } from '@shared/hooks';
 import { selectAppBootState } from '@store/index';
 
@@ -16,7 +17,8 @@ const Layout: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const isLanding = pathname === '/';
-  const isCollection = pathname === '/recipes' || pathname === '/recipes/library';
+  const isCollection =
+    pathname === '/recipes' || pathname === '/recipes/library' || world === 'restaurants';
   const isDetail = /^\/recipe\/[^/]+\/?$/.test(pathname);
   const isEditor = pathname === '/recipes/new' || /^\/recipe\/[^/]+\/edit\/?$/.test(pathname);
   const isCooking = /^\/recipe\/[^/]+\/cook\/?$/.test(pathname);
@@ -31,8 +33,10 @@ const Layout: React.FC = () => {
       </div>
     );
 
-  return (
-    <div className="food-hub-shell">
+  const shell = (
+    <div
+      className={`food-hub-shell${world === 'restaurants' ? ' food-hub-shell--restaurants' : ''}`}
+    >
       <a className="hub-skip-link" href="#hub-content">
         Skip to content
       </a>
@@ -71,6 +75,7 @@ const Layout: React.FC = () => {
       </main>
     </div>
   );
+  return world === 'restaurants' ? <RestaurantsProvider>{shell}</RestaurantsProvider> : shell;
 };
 
 export default Layout;

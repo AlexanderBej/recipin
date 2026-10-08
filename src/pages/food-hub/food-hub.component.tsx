@@ -40,10 +40,10 @@ export default function FoodHub() {
             </span>
           </div>
         </Link>
-        <article
+        <Link
+          to="/restaurants"
           className="hub-world-card hub-world-card--restaurants"
           aria-labelledby="restaurants-world-title"
-          aria-disabled="true"
         >
           <img
             src={restaurantsImage}
@@ -54,15 +54,17 @@ export default function FoodHub() {
           <div className="hub-world-card__top">
             <FiMapPin aria-hidden="true" />
             <span>02 / OUT THERE</span>
-            <span className="hub-world-card__soon">Coming soon</span>
           </div>
           <div className="hub-world-card__content">
             <div>
               <h2 id="restaurants-world-title">Restaurants</h2>
               <p>Tables worth coming back to.</p>
             </div>
+            <span className="hub-world-card__arrow" aria-hidden="true">
+              <FiArrowUpRight />
+            </span>
           </div>
-        </article>
+        </Link>
       </section>
       <div className="food-hub__signoff">
         <span>Made. Found. Remembered.</span>
